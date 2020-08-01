@@ -4,7 +4,7 @@
   "description": "express, ts, graphql, typeorm playground",
   "main": "server.ts",
   "scripts": {
-    "dev": "tsnd --respawn --transpile-only --clear src/server.ts",
+    "dev": "concurrently 'tsc -w' 'node-dev --respawn dist/server.js' 'yarn generate --watch'",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts",
@@ -59,14 +59,15 @@
     "@types/passport-google-oauth": "^1.0.41",
     "@typescript-eslint/eslint-plugin": "^3.7.1",
     "@typescript-eslint/parser": "^3.7.1",
+    "concurrently": "^5.2.0",
     "eslint": "^7.5.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
+    "node-dev": "^5.1.0",
     "prettier": "^2.0.5",
     "reflect-metadata": "^0.1.13",
-    "ts-node-dev": "^1.0.0-pre.56",
     "typescript": "^3.9.7"
   },
   "husky": {

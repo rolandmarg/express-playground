@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { UserEntity } from 'src/entity/User';
-import { CalendarEventEntity } from 'src/entity/CalendarEvent';
-import { IContext } from 'src/app';
+import { UserEntity } from '../entity/User';
+import { CalendarEventEntity } from '../entity/CalendarEvent';
+import { IContext } from '../graphql/apollo';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;

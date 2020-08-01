@@ -1,4 +1,4 @@
-schema: 'src/typeDefs.ts'
+schema: 'src/graphql/typeDefs.ts'
 documents: null
 generates:
   src/graphql/types.ts:
@@ -6,7 +6,7 @@ generates:
       - 'typescript'
       - 'typescript-resolvers'
     config:
-      contextType: src/app#IContext
+      contextType: ../graphql/apollo#IContext
       mappers:
-        User: src/entity/User#UserEntity
-        CalendarEvent: src/entity/CalendarEvent#CalendarEventEntity
+        User: ../entity/User#UserEntity
+        CalendarEvent: ../entity/CalendarEvent#CalendarEventEntity

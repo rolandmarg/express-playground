@@ -2,10 +2,10 @@ import { Repository, getRepository } from 'typeorm';
 import { Request, Response } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { UserEntity } from '../entity/User';
-import { AuthDirective } from './authDirective';
 import { CalendarEventEntity } from '../entity/CalendarEvent';
 import { typeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
+import { AuthDirective } from './authDirective';
 
 export interface IContext {
   req: Request;
