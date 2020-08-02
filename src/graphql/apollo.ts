@@ -1,18 +1,17 @@
 import { Repository, getRepository } from 'typeorm';
 import { Request, Response } from 'express';
 import { ApolloServer } from 'apollo-server-express';
-import { UserEntity } from '../entity/User';
-import { CalendarEventEntity } from '../entity/CalendarEvent';
 import { typeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
 import { AuthDirective } from './authDirective';
+import { User, Meeting } from '../entity';
 
 export interface IContext {
   req: Request;
   res: Response;
-  user?: UserEntity;
-  userRepo: Repository<UserEntity>;
-  calendarEventRepo: Repository<CalendarEventEntity>;
+  user?: User;
+  userRepo: Repository<User>;
+  meetingRepo: Repository<Meeting>;
 }
 
 const apolloServer = new ApolloServer({
@@ -23,8 +22,8 @@ const apolloServer = new ApolloServer({
     const ctx: IContext = {
       req,
       res,
-      userRepo: getRepository(UserEntity),
-      calendarEventRepo: getRepository(CalendarEventEntity),
+      userRepo: getRepository(User),
+      meetingRepo: getRepository(Meeting),
     };
 
     return ctx;

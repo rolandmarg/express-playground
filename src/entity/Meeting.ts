@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { Length, IsDate, MinDate, MaxDate } from 'class-validator';
 
 @Entity()
-export class CalendarEventEntity {
+export class Meeting {
   @PrimaryGeneratedColumn()
   id: number;
 

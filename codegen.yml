@@ -7,6 +7,7 @@ generates:
       - 'typescript-resolvers'
     config:
       contextType: ../graphql/apollo#IContext
+      mapperTypeSuffix: Entity
       mappers:
-        User: ../entity/User#UserEntity
-        CalendarEvent: ../entity/CalendarEvent#CalendarEventEntity
+        User: ../entity#User
+        Meeting: ../entity#Meeting

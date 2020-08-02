@@ -28,29 +28,29 @@ export const resolvers: Resolvers = {
 
       return users;
     },
-    async calendarEvent(_parent, args, context) {
-      const calendarEvent = await context.calendarEventRepo.findOne(args.id);
+    async meeting(_parent, args, context) {
+      const meeting = await context.meetingRepo.findOne(args.id);
 
-      return calendarEvent;
+      return meeting;
     },
-    async calendarEvents(_parent, _args, context) {
-      const calendarEvents = await context.calendarEventRepo.find();
+    async meetings(_parent, _args, context) {
+      const meetings = await context.meetingRepo.find();
 
-      return calendarEvents;
+      return meetings;
     },
   },
   Mutation: {
-    async createCalendarEvent(_parent, args, context) {
-      const calendarEvent = await context.calendarEventRepo.save({
+    async createMeeting(_parent, args, context) {
+      const meeting = await context.meetingRepo.save({
         title: args.input.title,
         startsAt: args.input.startsAt,
         endsAt: args.input.endsAt,
       });
 
-      return { calendarEvent };
+      return { meeting };
     },
-    async deleteCalendarEvents(_parent, _args, context) {
-      const result = await context.calendarEventRepo.delete({});
+    async deleteMeetings(_parent, _args, context) {
+      const result = await context.meetingRepo.delete({});
 
       return !!result.affected;
     },

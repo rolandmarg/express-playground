@@ -2,23 +2,23 @@ import Iron from '@hapi/iron';
 import ms from 'ms';
 import { unauthorized } from '@hapi/boom';
 import { Request, Response, NextFunction } from 'express';
-import { UserEntity } from '../entity/User';
+import { User } from '../entity';
 
 const tokenSecret = process.env.TOKEN_SECRET;
 const tokenMaxAge = ms(process.env.TOKEN_MAX_AGE);
 
 interface Token {
-  user: UserEntity;
+  user: User;
   createdAt: number;
 }
 
-export async function seal(user: UserEntity) {
+export async function seal(user: User) {
   const token: Token = { user, createdAt: Date.now() };
 
   return Iron.seal(token, tokenSecret, Iron.defaults);
 }
 
-export async function sealResponse(res: Response, user: UserEntity) {
+export async function sealResponse(res: Response, user: User) {
   const token = await seal(user);
 
   res.cookie('sid', token, {

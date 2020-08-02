@@ -1,6 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { UserEntity } from '../entity/User';
-import { CalendarEventEntity } from '../entity/CalendarEvent';
+import { User as UserEntity, Meeting as MeetingEntity } from '../entity';
 import { IContext } from '../graphql/apollo';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
@@ -23,15 +22,15 @@ export type User = {
   createdAt: Scalars['String'];
 };
 
-export type CalendarEvent = {
-  __typename?: 'CalendarEvent';
+export type Meeting = {
+  __typename?: 'Meeting';
   id: Scalars['ID'];
   title: Scalars['String'];
   startsAt: Scalars['String'];
   endsAt: Scalars['String'];
 };
 
-export type CreateCalendarEventInput = {
+export type CreateMeetingInput = {
   title: Scalars['String'];
   startsAt: Scalars['String'];
   endsAt: Scalars['String'];
@@ -55,9 +54,9 @@ export type SignInError = {
   message: Scalars['String'];
 };
 
-export type CreateCalendarEventPayload = {
-  __typename?: 'CreateCalendarEventPayload';
-  calendarEvent?: Maybe<CalendarEvent>;
+export type CreateMeetingPayload = {
+  __typename?: 'CreateMeetingPayload';
+  meeting: Meeting;
 };
 
 export type Query = {
@@ -65,8 +64,8 @@ export type Query = {
   user?: Maybe<User>;
   users: Array<User>;
   viewer?: Maybe<User>;
-  calendarEvents: Array<CalendarEvent>;
-  calendarEvent?: Maybe<CalendarEvent>;
+  meetings: Array<Meeting>;
+  meeting?: Maybe<Meeting>;
 };
 
 
@@ -75,15 +74,15 @@ export type QueryUserArgs = {
 };
 
 
-export type QueryCalendarEventArgs = {
+export type QueryMeetingArgs = {
   id: Scalars['ID'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   signIn: SignInResult;
-  createCalendarEvent: CreateCalendarEventPayload;
-  deleteCalendarEvents?: Maybe<Scalars['Boolean']>;
+  createMeeting: CreateMeetingPayload;
+  deleteMeetings: Scalars['Boolean'];
 };
 
 
@@ -92,8 +91,8 @@ export type MutationSignInArgs = {
 };
 
 
-export type MutationCreateCalendarEventArgs = {
-  input: CreateCalendarEventInput;
+export type MutationCreateMeetingArgs = {
+  input: CreateMeetingInput;
 };
 
 
@@ -177,13 +176,13 @@ export type ResolversTypes = {
   User: ResolverTypeWrapper<UserEntity>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
-  CalendarEvent: ResolverTypeWrapper<CalendarEventEntity>;
-  CreateCalendarEventInput: CreateCalendarEventInput;
+  Meeting: ResolverTypeWrapper<MeetingEntity>;
+  CreateMeetingInput: CreateMeetingInput;
   SignInInput: SignInInput;
   SignInResult: ResolversTypes['SignInPayload'] | ResolversTypes['SignInError'];
   SignInPayload: ResolverTypeWrapper<Omit<SignInPayload, 'user'> & { user: ResolversTypes['User'] }>;
   SignInError: ResolverTypeWrapper<SignInError>;
-  CreateCalendarEventPayload: ResolverTypeWrapper<Omit<CreateCalendarEventPayload, 'calendarEvent'> & { calendarEvent?: Maybe<ResolversTypes['CalendarEvent']> }>;
+  CreateMeetingPayload: ResolverTypeWrapper<Omit<CreateMeetingPayload, 'meeting'> & { meeting: ResolversTypes['Meeting'] }>;
   Query: ResolverTypeWrapper<{}>;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
@@ -194,13 +193,13 @@ export type ResolversParentTypes = {
   User: UserEntity;
   ID: Scalars['ID'];
   String: Scalars['String'];
-  CalendarEvent: CalendarEventEntity;
-  CreateCalendarEventInput: CreateCalendarEventInput;
+  Meeting: MeetingEntity;
+  CreateMeetingInput: CreateMeetingInput;
   SignInInput: SignInInput;
   SignInResult: ResolversParentTypes['SignInPayload'] | ResolversParentTypes['SignInError'];
   SignInPayload: Omit<SignInPayload, 'user'> & { user: ResolversParentTypes['User'] };
   SignInError: SignInError;
-  CreateCalendarEventPayload: Omit<CreateCalendarEventPayload, 'calendarEvent'> & { calendarEvent?: Maybe<ResolversParentTypes['CalendarEvent']> };
+  CreateMeetingPayload: Omit<CreateMeetingPayload, 'meeting'> & { meeting: ResolversParentTypes['Meeting'] };
   Query: {};
   Mutation: {};
   Boolean: Scalars['Boolean'];
@@ -217,7 +216,7 @@ export type UserResolvers<ContextType = IContext, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
-export type CalendarEventResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['CalendarEvent'] = ResolversParentTypes['CalendarEvent']> = {
+export type MeetingResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Meeting'] = ResolversParentTypes['Meeting']> = {
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   startsAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -240,8 +239,8 @@ export type SignInErrorResolvers<ContextType = IContext, ParentType extends Reso
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
-export type CreateCalendarEventPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['CreateCalendarEventPayload'] = ResolversParentTypes['CreateCalendarEventPayload']> = {
-  calendarEvent?: Resolver<Maybe<ResolversTypes['CalendarEvent']>, ParentType, ContextType>;
+export type CreateMeetingPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['CreateMeetingPayload'] = ResolversParentTypes['CreateMeetingPayload']> = {
+  meeting?: Resolver<ResolversTypes['Meeting'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
@@ -249,23 +248,23 @@ export type QueryResolvers<ContextType = IContext, ParentType extends ResolversP
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   viewer?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  calendarEvents?: Resolver<Array<ResolversTypes['CalendarEvent']>, ParentType, ContextType>;
-  calendarEvent?: Resolver<Maybe<ResolversTypes['CalendarEvent']>, ParentType, ContextType, RequireFields<QueryCalendarEventArgs, 'id'>>;
+  meetings?: Resolver<Array<ResolversTypes['Meeting']>, ParentType, ContextType>;
+  meeting?: Resolver<Maybe<ResolversTypes['Meeting']>, ParentType, ContextType, RequireFields<QueryMeetingArgs, 'id'>>;
 };
 
 export type MutationResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   signIn?: Resolver<ResolversTypes['SignInResult'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'input'>>;
-  createCalendarEvent?: Resolver<ResolversTypes['CreateCalendarEventPayload'], ParentType, ContextType, RequireFields<MutationCreateCalendarEventArgs, 'input'>>;
-  deleteCalendarEvents?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  createMeeting?: Resolver<ResolversTypes['CreateMeetingPayload'], ParentType, ContextType, RequireFields<MutationCreateMeetingArgs, 'input'>>;
+  deleteMeetings?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = IContext> = {
   User?: UserResolvers<ContextType>;
-  CalendarEvent?: CalendarEventResolvers<ContextType>;
+  Meeting?: MeetingResolvers<ContextType>;
   SignInResult?: SignInResultResolvers<ContextType>;
   SignInPayload?: SignInPayloadResolvers<ContextType>;
   SignInError?: SignInErrorResolvers<ContextType>;
-  CreateCalendarEventPayload?: CreateCalendarEventPayloadResolvers<ContextType>;
+  CreateMeetingPayload?: CreateMeetingPayloadResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
 };

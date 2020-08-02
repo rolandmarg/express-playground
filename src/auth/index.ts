@@ -1,7 +1,7 @@
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth';
 import { getRepository } from 'typeorm';
-import { UserEntity } from '../entity/User';
+import { User } from '../entity';
 
 passport.use(
   new GoogleStrategy.OAuth2Strategy(
@@ -11,7 +11,7 @@ passport.use(
       callbackURL: 'http://localhost:3000/auth/google/callback',
     },
     async (_accessToken, _refreshToken, profile, done) => {
-      const userRepository = getRepository(UserEntity);
+      const userRepository = getRepository(User);
 
       const email = profile.emails[0].value;
 

@@ -9,14 +9,14 @@ export const typeDefs = gql`
     createdAt: String!
   }
 
-  type CalendarEvent {
+  type Meeting {
     id: ID!
     title: String!
     startsAt: String!
     endsAt: String!
   }
 
-  input CreateCalendarEventInput {
+  input CreateMeetingInput {
     title: String!
     startsAt: String!
     endsAt: String!
@@ -38,23 +38,21 @@ export const typeDefs = gql`
     message: String!
   }
 
-  type CreateCalendarEventPayload {
-    calendarEvent: CalendarEvent
+  type CreateMeetingPayload {
+    meeting: Meeting!
   }
 
   type Query {
     user(id: ID!): User
     users: [User!]!
     viewer: User @auth
-    calendarEvents: [CalendarEvent!]!
-    calendarEvent(id: ID!): CalendarEvent
+    meetings: [Meeting!]!
+    meeting(id: ID!): Meeting
   }
 
   type Mutation {
     signIn(input: SignInInput!): SignInResult!
-    createCalendarEvent(
-      input: CreateCalendarEventInput!
-    ): CreateCalendarEventPayload!
-    deleteCalendarEvents: Boolean
+    createMeeting(input: CreateMeetingInput!): CreateMeetingPayload!
+    deleteMeetings: Boolean!
   }
 `;
