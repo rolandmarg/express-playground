@@ -1,7 +1,11 @@
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth';
 import { getRepository } from 'typeorm';
-import { User } from '../entity';
+import { User } from '../entity/User';
+import { RequestHandler } from 'express';
+import { sealResponse } from './helpers';
+
+export * from './helpers';
 
 passport.use(
   new GoogleStrategy.OAuth2Strategy(
@@ -34,3 +38,9 @@ export const googleAuthCallback = passport.authenticate('google', {
   session: false,
   failureRedirect: '/login',
 });
+
+export const cookieAuth: RequestHandler = async (req, res) => {
+  await sealResponse(res, req.user as User);
+
+  res.redirect('/secret');
+};

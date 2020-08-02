@@ -9,7 +9,7 @@ import {
 
 import { SchemaDirectiveVisitor } from 'apollo-server-express';
 import { IContext } from './apollo';
-import { unsealRequest } from '../auth/helpers';
+import { unsealRequest } from '../auth';
 
 export class AuthDirective extends SchemaDirectiveVisitor {
   public static getDirectiveDeclaration(
