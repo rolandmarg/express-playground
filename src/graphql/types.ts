@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { User as UserEntity, Meeting as MeetingEntity } from '../entity';
 import { IContext } from '../graphql/apollo';
-export type Maybe<T> = T | null;
+export type Maybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
@@ -95,7 +95,8 @@ export type MutationCreateMeetingArgs = {
   input: CreateMeetingInput;
 };
 
-
+export type WithIndex<TObject> = TObject & Record<string, any>;
+export type ResolversObject<TObject> = WithIndex<TObject>;
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
@@ -172,7 +173,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 ) => TResult | Promise<TResult>;
 
 /** Mapping between all available schema types and the resolvers types */
-export type ResolversTypes = {
+export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<UserEntity>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -186,10 +187,10 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-};
+}>;
 
 /** Mapping between all available schema types and the resolvers parents */
-export type ResolversParentTypes = {
+export type ResolversParentTypes = ResolversObject<{
   User: UserEntity;
   ID: Scalars['ID'];
   String: Scalars['String'];
@@ -203,62 +204,62 @@ export type ResolversParentTypes = {
   Query: {};
   Mutation: {};
   Boolean: Scalars['Boolean'];
-};
+}>;
 
 export type AuthDirectiveArgs = {  };
 
 export type AuthDirectiveResolver<Result, Parent, ContextType = IContext, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type UserResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+export type UserResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-};
+}>;
 
-export type MeetingResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Meeting'] = ResolversParentTypes['Meeting']> = {
+export type MeetingResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Meeting'] = ResolversParentTypes['Meeting']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   startsAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   endsAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-};
+}>;
 
-export type SignInResultResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInResult'] = ResolversParentTypes['SignInResult']> = {
+export type SignInResultResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInResult'] = ResolversParentTypes['SignInResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'SignInPayload' | 'SignInError', ParentType, ContextType>;
-};
+}>;
 
-export type SignInPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInPayload'] = ResolversParentTypes['SignInPayload']> = {
+export type SignInPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInPayload'] = ResolversParentTypes['SignInPayload']> = ResolversObject<{
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-};
+}>;
 
-export type SignInErrorResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInError'] = ResolversParentTypes['SignInError']> = {
+export type SignInErrorResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInError'] = ResolversParentTypes['SignInError']> = ResolversObject<{
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-};
+}>;
 
-export type CreateMeetingPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['CreateMeetingPayload'] = ResolversParentTypes['CreateMeetingPayload']> = {
+export type CreateMeetingPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['CreateMeetingPayload'] = ResolversParentTypes['CreateMeetingPayload']> = ResolversObject<{
   meeting?: Resolver<ResolversTypes['Meeting'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-};
+}>;
 
-export type QueryResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+export type QueryResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   viewer?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   meetings?: Resolver<Array<ResolversTypes['Meeting']>, ParentType, ContextType>;
   meeting?: Resolver<Maybe<ResolversTypes['Meeting']>, ParentType, ContextType, RequireFields<QueryMeetingArgs, 'id'>>;
-};
+}>;
 
-export type MutationResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+export type MutationResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   signIn?: Resolver<ResolversTypes['SignInResult'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'input'>>;
   createMeeting?: Resolver<ResolversTypes['CreateMeetingPayload'], ParentType, ContextType, RequireFields<MutationCreateMeetingArgs, 'input'>>;
   deleteMeetings?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-};
+}>;
 
-export type Resolvers<ContextType = IContext> = {
+export type Resolvers<ContextType = IContext> = ResolversObject<{
   User?: UserResolvers<ContextType>;
   Meeting?: MeetingResolvers<ContextType>;
   SignInResult?: SignInResultResolvers<ContextType>;
@@ -267,7 +268,7 @@ export type Resolvers<ContextType = IContext> = {
   CreateMeetingPayload?: CreateMeetingPayloadResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
-};
+}>;
 
 
 /**
@@ -275,9 +276,9 @@ export type Resolvers<ContextType = IContext> = {
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
 export type IResolvers<ContextType = IContext> = Resolvers<ContextType>;
-export type DirectiveResolvers<ContextType = IContext> = {
+export type DirectiveResolvers<ContextType = IContext> = ResolversObject<{
   auth?: AuthDirectiveResolver<any, any, ContextType>;
-};
+}>;
 
 
 /**

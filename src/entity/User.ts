@@ -9,12 +9,12 @@ import { IsEmail } from 'class-validator';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ unique: true })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 }

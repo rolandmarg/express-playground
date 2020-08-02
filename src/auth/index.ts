@@ -17,7 +17,13 @@ passport.use(
     async (_accessToken, _refreshToken, profile, done) => {
       const userRepository = getRepository(User);
 
+      if (!profile.emails) {
+        return done(new Error('no email provided'), null);
+      }
       const email = profile.emails[0].value;
+      if (!email) {
+        return done(new Error('no email provided'), null);
+      }
 
       let user = await userRepository.findOne({ email });
       if (!user) {

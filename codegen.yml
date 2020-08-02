@@ -7,6 +7,8 @@ generates:
       - 'typescript-resolvers'
     config:
       contextType: ../graphql/apollo#IContext
+      useIndexSignature: true
+      maybeValue: T | null | undefined
       mapperTypeSuffix: Entity
       mappers:
         User: ../entity#User

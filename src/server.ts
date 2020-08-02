@@ -8,6 +8,7 @@ async function bootstrap() {
     url: process.env.DB_URL,
     synchronize: process.env.NODE_ENV !== 'production',
     entities,
+    logging: ['info'],
   });
 
   app.listen(3000);
