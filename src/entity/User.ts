@@ -4,7 +4,6 @@ import {
   Column,
   CreateDateColumn,
 } from 'typeorm';
-import { IsEmail } from 'class-validator';
 
 @Entity()
 export class User {
@@ -12,7 +11,6 @@ export class User {
   id!: number;
 
   @Column({ unique: true })
-  @IsEmail()
   email!: string;
 
   @CreateDateColumn()

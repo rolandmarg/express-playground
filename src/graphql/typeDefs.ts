@@ -27,17 +27,6 @@ export const typeDefs = gql`
     password: String!
   }
 
-  union SignInResult = SignInPayload | SignInError
-
-  type SignInPayload {
-    user: User!
-    token: String!
-  }
-
-  type SignInError {
-    message: String!
-  }
-
   type CreateMeetingPayload {
     meeting: Meeting!
   }
@@ -51,7 +40,6 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    signIn(input: SignInInput!): SignInResult!
     createMeeting(input: CreateMeetingInput!): CreateMeetingPayload!
     deleteMeetings: Boolean!
   }

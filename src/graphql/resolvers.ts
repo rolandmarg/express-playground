@@ -1,19 +1,6 @@
-import { Resolvers } from './types';
+import type { Resolvers } from './types';
 
 export const resolvers: Resolvers = {
-  SignInResult: {
-    __resolveType(parent) {
-      if ('message' in parent) {
-        return 'SignInError';
-      }
-
-      if ('user' in parent) {
-        return 'SignInPayload';
-      }
-
-      return null;
-    },
-  },
   Query: {
     async viewer(_parent, _args, context) {
       return context.user;

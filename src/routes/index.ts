@@ -1,5 +1,12 @@
 import { Router, RequestHandler, ErrorRequestHandler } from 'express';
-import { authGuard, googleAuth, googleAuthCallback, cookieAuth } from '../auth';
+import {
+  authGuard,
+  googleAuth,
+  googleAuthCallback,
+  cookieAuth,
+  logout,
+} from '../auth';
+import { APIError } from '../utils/errors';
 
 const sendAuthInfo: RequestHandler = (req, res) => {
   res.send(req.user);
@@ -10,8 +17,14 @@ const notFound: RequestHandler = (_req, res) => {
 };
 
 const dreamCatcher: ErrorRequestHandler = (err, _req, res, next) => {
-  console.error(err);
-  res.status(500).send('Ooh!');
+  if (err instanceof APIError) {
+    res.status(err.statusCode).send(err.message);
+  } else {
+    console.error(err);
+    const e = new APIError();
+    res.status(e.statusCode).send(e.message);
+  }
+
   next();
 };
 
@@ -20,7 +33,8 @@ export const routes = () => {
 
   router.get('/auth/google', googleAuth);
   router.get('/auth/google/callback', googleAuthCallback, cookieAuth);
-  router.get('/me', authGuard, sendAuthInfo);
+  router.get('/secret', authGuard, sendAuthInfo);
+  router.get('/logout', logout);
 
   router.use(notFound);
   router.use(dreamCatcher);

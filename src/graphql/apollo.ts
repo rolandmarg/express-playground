@@ -5,6 +5,7 @@ import { typeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
 import { AuthDirective } from './authDirective';
 import { User, Meeting } from '../entity';
+import { APIError } from '../utils/errors';
 
 export interface IContext {
   req: Request;
@@ -27,6 +28,14 @@ const apolloServer = new ApolloServer({
     };
 
     return ctx;
+  },
+  formatError: (err) => {
+    if (err.originalError instanceof APIError) {
+      return err;
+    } else {
+      console.error(err.originalError);
+      return new APIError();
+    }
   },
 });
 

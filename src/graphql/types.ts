@@ -41,19 +41,6 @@ export type SignInInput = {
   password: Scalars['String'];
 };
 
-export type SignInResult = SignInPayload | SignInError;
-
-export type SignInPayload = {
-  __typename?: 'SignInPayload';
-  user: User;
-  token: Scalars['String'];
-};
-
-export type SignInError = {
-  __typename?: 'SignInError';
-  message: Scalars['String'];
-};
-
 export type CreateMeetingPayload = {
   __typename?: 'CreateMeetingPayload';
   meeting: Meeting;
@@ -80,14 +67,8 @@ export type QueryMeetingArgs = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  signIn: SignInResult;
   createMeeting: CreateMeetingPayload;
   deleteMeetings: Scalars['Boolean'];
-};
-
-
-export type MutationSignInArgs = {
-  input: SignInInput;
 };
 
 
@@ -180,9 +161,6 @@ export type ResolversTypes = ResolversObject<{
   Meeting: ResolverTypeWrapper<MeetingEntity>;
   CreateMeetingInput: CreateMeetingInput;
   SignInInput: SignInInput;
-  SignInResult: ResolversTypes['SignInPayload'] | ResolversTypes['SignInError'];
-  SignInPayload: ResolverTypeWrapper<Omit<SignInPayload, 'user'> & { user: ResolversTypes['User'] }>;
-  SignInError: ResolverTypeWrapper<SignInError>;
   CreateMeetingPayload: ResolverTypeWrapper<Omit<CreateMeetingPayload, 'meeting'> & { meeting: ResolversTypes['Meeting'] }>;
   Query: ResolverTypeWrapper<{}>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -197,9 +175,6 @@ export type ResolversParentTypes = ResolversObject<{
   Meeting: MeetingEntity;
   CreateMeetingInput: CreateMeetingInput;
   SignInInput: SignInInput;
-  SignInResult: ResolversParentTypes['SignInPayload'] | ResolversParentTypes['SignInError'];
-  SignInPayload: Omit<SignInPayload, 'user'> & { user: ResolversParentTypes['User'] };
-  SignInError: SignInError;
   CreateMeetingPayload: Omit<CreateMeetingPayload, 'meeting'> & { meeting: ResolversParentTypes['Meeting'] };
   Query: {};
   Mutation: {};
@@ -225,21 +200,6 @@ export type MeetingResolvers<ContextType = IContext, ParentType extends Resolver
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type SignInResultResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInResult'] = ResolversParentTypes['SignInResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'SignInPayload' | 'SignInError', ParentType, ContextType>;
-}>;
-
-export type SignInPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInPayload'] = ResolversParentTypes['SignInPayload']> = ResolversObject<{
-  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-}>;
-
-export type SignInErrorResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['SignInError'] = ResolversParentTypes['SignInError']> = ResolversObject<{
-  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-}>;
-
 export type CreateMeetingPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['CreateMeetingPayload'] = ResolversParentTypes['CreateMeetingPayload']> = ResolversObject<{
   meeting?: Resolver<ResolversTypes['Meeting'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
@@ -254,7 +214,6 @@ export type QueryResolvers<ContextType = IContext, ParentType extends ResolversP
 }>;
 
 export type MutationResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  signIn?: Resolver<ResolversTypes['SignInResult'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'input'>>;
   createMeeting?: Resolver<ResolversTypes['CreateMeetingPayload'], ParentType, ContextType, RequireFields<MutationCreateMeetingArgs, 'input'>>;
   deleteMeetings?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 }>;
@@ -262,9 +221,6 @@ export type MutationResolvers<ContextType = IContext, ParentType extends Resolve
 export type Resolvers<ContextType = IContext> = ResolversObject<{
   User?: UserResolvers<ContextType>;
   Meeting?: MeetingResolvers<ContextType>;
-  SignInResult?: SignInResultResolvers<ContextType>;
-  SignInPayload?: SignInPayloadResolvers<ContextType>;
-  SignInError?: SignInErrorResolvers<ContextType>;
   CreateMeetingPayload?: CreateMeetingPayloadResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
