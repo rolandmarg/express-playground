@@ -22,7 +22,7 @@
   "scripts": {
     "dev": "concurrently 'tsc -w' 'node-dev --respawn dist/server.js' 'yarn generate --watch'",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts}\"",
     "type-check": "tsc --pretty --noEmit",
@@ -31,7 +31,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "yarn type-check"
+      "pre-push": "yarn type-check && yarn test"
     }
   },
   "lint-staged": {

@@ -1,43 +1,47 @@
 import type { Resolvers } from './types';
+import { getManager } from 'typeorm';
+import { Meeting, User } from '../entity';
 
 export const resolvers: Resolvers = {
   Query: {
     async viewer(_parent, _args, context) {
       return context.user;
     },
-    async user(_parent, args, context) {
-      const user = await context.userRepo.findOne(args.id);
+    async user(_parent, args) {
+      const user = await getManager().findOne(User, args.id);
 
       return user;
     },
-    async users(_parent, _args, context) {
-      const users = await context.userRepo.find();
+    async users() {
+      const users = await getManager().find(User);
 
       return users;
     },
-    async meeting(_parent, args, context) {
-      const meeting = await context.meetingRepo.findOne(args.id);
+    async meeting(_parent, args) {
+      const meeting = await getManager().findOne(Meeting, args.id);
 
       return meeting;
     },
-    async meetings(_parent, _args, context) {
-      const meetings = await context.meetingRepo.find();
+    async meetings() {
+      const meetings = await getManager().find(Meeting);
 
       return meetings;
     },
   },
   Mutation: {
-    async createMeeting(_parent, args, context) {
-      const meeting = await context.meetingRepo.save({
+    async createMeeting(_parent, args) {
+      const meeting = getManager().create(Meeting, {
         title: args.input.title,
         startsAt: args.input.startsAt,
         endsAt: args.input.endsAt,
       });
 
+      await getManager().save(meeting);
+
       return { meeting };
     },
-    async deleteMeetings(_parent, _args, context) {
-      const result = await context.meetingRepo.delete({});
+    async deleteMeetings() {
+      const result = await getManager().delete(Meeting, {});
 
       return !!result.affected;
     },
