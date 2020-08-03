@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import app from '../app';
 import { googleAuth, googleAuthCallback } from '../auth/google';
+import { TOKEN_MAX_AGE } from '../env';
 
 const testUser = {
   id: 1,
@@ -17,7 +18,13 @@ jest.mock('../auth/google', () => ({
   }),
 }));
 
-describe('API rest endpoints', () => {
+jest.mock('../env', () => ({
+  COOKIE_MAX_AGE: 10000, // ms
+  TOKEN_MAX_AGE: 100, //ms
+  TOKEN_SECRET: 'Password string too short (min 32 characters required)',
+}));
+
+describe('API suite', () => {
   let req: ReturnType<typeof supertest>;
   let agent: ReturnType<typeof supertest.agent>;
 
@@ -54,8 +61,8 @@ describe('API rest endpoints', () => {
   });
 
   it('/secret should return 200 after signing in', async () => {
-    await agent.get('/auth/google/callback');
-
+    const r = await agent.get('/auth/google/callback');
+    expect(r.header['set-cookie'][0]).toContain('sid');
     const res = await agent.get('/secret');
 
     expect(res.status).toBe(200);
@@ -81,15 +88,23 @@ describe('API rest endpoints', () => {
   it('/secret should return 401 after signing out', async () => {
     await agent.get('/auth/google/callback');
 
-    let res = await agent.get('/secret');
-
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual(testUser);
-
     await agent.get('/logout');
 
-    res = await agent.get('/secret');
+    const res = await agent.get('/secret');
 
     expect(res.status).toBe(401);
+  });
+
+  it('/secret should return 401 after session expires', async () => {
+    await agent.get('/auth/google/callback');
+
+    await new Promise((resolve) =>
+      setTimeout(async () => {
+        const res = await agent.get('/secret');
+
+        expect(res.status).toBe(401);
+        resolve();
+      }, TOKEN_MAX_AGE)
+    );
   });
 });

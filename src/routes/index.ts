@@ -17,6 +17,7 @@ const notFound: RequestHandler = (_req, res) => {
 };
 
 const dreamCatcher: ErrorRequestHandler = (err, _req, res, next) => {
+  // TODO maybe logout on unauthorized error
   if (err instanceof APIError) {
     res.status(err.statusCode).send(err.message);
   } else {

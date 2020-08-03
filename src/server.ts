@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import app from './app';
 import { createConnection } from 'typeorm';
 import entities from './entity';

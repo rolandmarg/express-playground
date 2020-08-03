@@ -2,7 +2,6 @@ import express from 'express';
 import passport from 'passport';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import 'dotenv/config';
 import 'reflect-metadata';
 import 'express-async-errors';
 import { apollo } from './graphql/apollo';
