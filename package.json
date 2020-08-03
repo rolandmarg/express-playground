@@ -42,7 +42,11 @@
   },
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "<rootDir>/dist/",
+      "<rootDir>/node_modules/"
+    ]
   },
   "dependencies": {
     "@hapi/iron": "^6.0.0",
