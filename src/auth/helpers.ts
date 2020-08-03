@@ -3,9 +3,10 @@ import ms from 'ms';
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../entity';
 import { Unauthorized } from '../utils/errors';
+import { TOKEN_SECRET, TOKEN_MAX_AGE, NODE_ENV } from '../env';
 
-const tokenSecret = process.env.TOKEN_SECRET;
-const tokenMaxAge = ms(process.env.TOKEN_MAX_AGE);
+const tokenSecret = TOKEN_SECRET;
+const tokenMaxAge = ms(TOKEN_MAX_AGE);
 
 interface Token {
   user: User;
@@ -39,8 +40,8 @@ export async function sealResponse(res: Response, user: User) {
 
   res.cookie('sid', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: ms(process.env.TOKEN_MAX_AGE),
+    secure: NODE_ENV === 'production',
+    maxAge: ms(TOKEN_MAX_AGE),
   });
 }
 
@@ -85,7 +86,7 @@ export async function cookieAuth(req: Request, res: Response) {
 export async function logout(_req: Request, res: Response) {
   res.clearCookie('sid', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: NODE_ENV === 'production',
   });
 
   res.redirect('/secret');
