@@ -1,16 +1,20 @@
 import Iron from '@hapi/iron';
+import ms from 'ms';
 import { Request, Response, NextFunction } from 'express';
-import { User } from '../entity';
-import { Unauthorized } from '../utils/errors';
+import { Unauthorized, AppError } from '../utils';
 import env from '../env';
 
 interface Token {
-  user: User;
+  payload: any;
   createdAt: number;
 }
 
-export async function seal(user: User) {
-  const token: Token = { user, createdAt: Date.now() };
+export async function seal(payload: any) {
+  if (!payload) {
+    throw new AppError();
+  }
+
+  const token: Token = { payload, createdAt: Date.now() };
 
   return Iron.seal(token, env.TOKEN_SECRET, Iron.defaults);
 }
@@ -22,22 +26,22 @@ export async function unseal(sealedToken: string) {
     Iron.defaults
   );
 
-  const expiresAt = token.createdAt + env.TOKEN_MAX_AGE_IN_MS;
+  const expiresAt = token.createdAt + ms(env.TOKEN_MAX_AGE);
 
   if (Date.now() >= expiresAt) {
     throw new Unauthorized('Session expired');
   }
 
-  return token.user;
+  return token.payload;
 }
 
-export async function sealResponse(res: Response, user: User) {
-  const token = await seal(user);
+export async function sealResponse(res: Response, payload: any) {
+  const token = await seal(payload);
 
   res.cookie('sid', token, {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
-    maxAge: env.COOKIE_MAX_AGE_IN_SECONDS,
+    maxAge: ms(env.COOKIE_MAX_AGE),
   });
 }
 
@@ -52,9 +56,9 @@ export async function unsealRequest(req: Request) {
     throw new Unauthorized();
   }
 
-  const user = await unseal(token);
+  const payload = await unseal(token);
 
-  return user;
+  return payload;
 }
 
 export async function authGuard(
@@ -62,19 +66,19 @@ export async function authGuard(
   _res: Response,
   next: NextFunction
 ) {
-  const user = await unsealRequest(req);
+  const payload = await unsealRequest(req);
 
-  if (!user) {
+  if (!payload) {
     throw new Unauthorized();
   }
 
-  req.user = user;
+  req.user = payload;
 
   next();
 }
 
 export async function cookieAuth(req: Request, res: Response) {
-  await sealResponse(res, req.user as User);
+  await sealResponse(res, req.user);
 
   res.redirect('/secret');
 }

@@ -2,7 +2,7 @@ import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth';
 import { getRepository } from 'typeorm';
 import { User } from '../entity/User';
-import { Unauthorized } from '../utils/errors';
+import { Unauthorized } from '../utils';
 import env from '../env';
 
 passport.use(

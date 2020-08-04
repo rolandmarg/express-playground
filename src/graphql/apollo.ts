@@ -4,7 +4,7 @@ import { typeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
 import { AuthDirective } from './authDirective';
 import { User } from '../entity';
-import { AppError } from '../utils/errors';
+import { AppError } from '../utils';
 
 export interface IContext {
   req: Request;

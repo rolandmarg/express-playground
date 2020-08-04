@@ -1,12 +1,12 @@
 import { Router, RequestHandler, ErrorRequestHandler } from 'express';
 import {
   authGuard,
-  googleAuth,
-  googleAuthCallback,
   cookieAuth,
   logout,
+  googleAuth,
+  googleAuthCallback,
 } from '../auth';
-import { AppError } from '../utils/errors';
+import { AppError } from '../utils';
 
 const sendAuthInfo: RequestHandler = (req, res) => {
   res.send(req.user);

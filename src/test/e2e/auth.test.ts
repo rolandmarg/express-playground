@@ -1,17 +1,16 @@
+import ms from 'ms';
 import supertest from 'supertest';
-import app from '../app';
-import { googleAuth, googleAuthCallback } from '../auth/google';
-import env from '../env';
-
-//TODO increase coverage
-//TODO some of these tests should be integration/unit
+import app from '../../app';
+import { googleAuth, googleAuthCallback } from '../../auth/google';
+import env from '../../env';
+import { sleep } from '../../utils';
 
 const testUser = {
   id: 1,
   email: 'test@gmail.com',
 };
 
-jest.mock('../auth/google', () => ({
+jest.mock('../../auth/google', () => ({
   googleAuth: jest.fn((_req, _res, next) => {
     next();
   }),
@@ -21,25 +20,19 @@ jest.mock('../auth/google', () => ({
   }),
 }));
 
-jest.mock('../env', () => ({
-  COOKIE_MAX_AGE_IN_SECONDS: 1,
-  TOKEN_MAX_AGE_IN_MS: 100,
+jest.mock('../../env', () => ({
+  COOKIE_MAX_AGE: '1s',
+  TOKEN_MAX_AGE: '100ms',
   TOKEN_SECRET: 'Password string too short (min 32 characters required)',
 }));
 
-describe('API suite', () => {
+describe('Auth e2e tests', () => {
   let req: ReturnType<typeof supertest>;
   let agent: ReturnType<typeof supertest.agent>;
 
   beforeEach(() => {
     req = supertest(app);
     agent = supertest.agent(app);
-  });
-
-  it('/non-existing-route should return 404', async () => {
-    const res = await req.get('/non-existing-route');
-
-    expect(res.status).toBe(404);
   });
 
   it('/secret should return 401', async () => {
@@ -88,9 +81,8 @@ describe('API suite', () => {
     expect(res.body).toEqual(testUser);
   });
 
-  it('/secret should return 401 after signing out', async () => {
+  it('/logout should clear cookie', async () => {
     await agent.get('/auth/google/callback');
-
     await agent.get('/logout');
 
     const res = await agent.get('/secret');
@@ -98,16 +90,27 @@ describe('API suite', () => {
     expect(res.status).toBe(401);
   });
 
-  it('/secret should return 401 after session expires', async () => {
+  it('/secret should return 401 after token expires', async () => {
     await agent.get('/auth/google/callback');
 
-    await new Promise((resolve) =>
-      setTimeout(async () => {
-        const res = await agent.get('/secret');
+    await sleep(ms(env.TOKEN_MAX_AGE));
 
-        expect(res.status).toBe(401);
-        resolve();
-      }, env.TOKEN_MAX_AGE_IN_MS)
-    );
+    const res = await agent.get('/secret');
+
+    expect(res.status).toBe(401);
+
+    expect(res.text).toBe('Session expired');
+  });
+
+  it('/secret should return 401 after cookie expires', async () => {
+    await agent.get('/auth/google/callback');
+
+    await sleep(ms(env.COOKIE_MAX_AGE));
+
+    const res = await agent.get('/secret');
+
+    expect(res.status).toBe(401);
+
+    expect(res.text).toBe('Unauthorized');
   });
 });
