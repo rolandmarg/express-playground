@@ -4,7 +4,7 @@ import { typeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
 import { AuthDirective } from './authDirective';
 import { User } from '../entity';
-import { APIError } from '../utils/errors';
+import { AppError } from '../utils/errors';
 
 export interface IContext {
   req: Request;
@@ -17,11 +17,11 @@ const apolloServer = new ApolloServer({
   resolvers,
   schemaDirectives: { auth: AuthDirective },
   formatError: (err) => {
-    if (err.originalError instanceof APIError) {
+    if (err.originalError instanceof AppError) {
       return err;
     } else {
       console.error(err);
-      return new APIError();
+      return new AppError();
     }
   },
 });

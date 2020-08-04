@@ -6,7 +6,7 @@ import {
   cookieAuth,
   logout,
 } from '../auth';
-import { APIError } from '../utils/errors';
+import { AppError } from '../utils/errors';
 
 const sendAuthInfo: RequestHandler = (req, res) => {
   res.send(req.user);
@@ -18,11 +18,11 @@ const notFound: RequestHandler = (_req, res) => {
 
 const dreamCatcher: ErrorRequestHandler = (err, _req, res, next) => {
   // TODO maybe logout on unauthorized error
-  if (err instanceof APIError) {
+  if (err instanceof AppError) {
     res.status(err.statusCode).send(err.message);
   } else {
     console.error(err);
-    const e = new APIError();
+    const e = new AppError();
     res.status(e.statusCode).send(e.message);
   }
 

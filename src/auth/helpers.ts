@@ -2,7 +2,8 @@ import Iron from '@hapi/iron';
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../entity';
 import { Unauthorized } from '../utils/errors';
-import { TOKEN_SECRET, TOKEN_MAX_AGE, NODE_ENV, COOKIE_MAX_AGE } from '../env';
+import env from '../env';
+
 interface Token {
   user: User;
   createdAt: number;
@@ -11,17 +12,17 @@ interface Token {
 export async function seal(user: User) {
   const token: Token = { user, createdAt: Date.now() };
 
-  return Iron.seal(token, TOKEN_SECRET, Iron.defaults);
+  return Iron.seal(token, env.TOKEN_SECRET, Iron.defaults);
 }
 
 export async function unseal(sealedToken: string) {
   const token: Token = await Iron.unseal(
     sealedToken,
-    TOKEN_SECRET,
+    env.TOKEN_SECRET,
     Iron.defaults
   );
 
-  const expiresAt = token.createdAt + TOKEN_MAX_AGE;
+  const expiresAt = token.createdAt + env.TOKEN_MAX_AGE_IN_MS;
 
   if (Date.now() >= expiresAt) {
     throw new Unauthorized('Session expired');
@@ -35,8 +36,8 @@ export async function sealResponse(res: Response, user: User) {
 
   res.cookie('sid', token, {
     httpOnly: true,
-    secure: NODE_ENV === 'production',
-    maxAge: COOKIE_MAX_AGE,
+    secure: env.NODE_ENV === 'production',
+    maxAge: env.COOKIE_MAX_AGE_IN_SECONDS,
   });
 }
 
@@ -81,7 +82,7 @@ export async function cookieAuth(req: Request, res: Response) {
 export async function logout(_req: Request, res: Response) {
   res.clearCookie('sid', {
     httpOnly: true,
-    secure: NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
   });
 
   res.redirect('/secret');

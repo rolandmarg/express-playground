@@ -1,4 +1,4 @@
-export class APIError extends Error {
+export class AppError extends Error {
   readonly statusCode: number;
 
   constructor(message = 'Ooh! Nasty things! Nasty!', statusCode = 500) {
@@ -8,13 +8,13 @@ export class APIError extends Error {
   }
 }
 
-export class BadRequest extends APIError {
+export class BadRequest extends AppError {
   constructor(message = 'Bad Request') {
     super(message, 400);
   }
 }
 
-export class Unauthorized extends APIError {
+export class Unauthorized extends AppError {
   constructor(message = 'Unauthorized') {
     super(message, 401);
   }
