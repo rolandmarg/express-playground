@@ -1,3 +1,4 @@
+import Iron from '@hapi/iron';
 import {
   seal,
   unseal,
@@ -6,7 +7,9 @@ import {
   authGuard,
   cookieAuth,
   logout,
+  Token,
 } from '../../auth/helpers';
+import env from '../../env';
 
 const testUser = {
   id: 1,
@@ -114,10 +117,32 @@ describe('Auth integration tests', () => {
         },
       },
     };
+    const next = jest.fn();
 
-    await expect(
-      authGuard(req as any, null as any, null as any)
-    ).rejects.toThrow();
+    await expect(authGuard(req as any, null as any, next)).rejects.toThrow();
+
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('authGuard should throw on no payload', async () => {
+    const token: Token = {
+      createdAt: Date.now(),
+      payload: null,
+    };
+    const sealedToken = await Iron.seal(token, env.TOKEN_SECRET, Iron.defaults);
+
+    const req = {
+      cookies: {
+        get sid() {
+          return sealedToken;
+        },
+      },
+    };
+    const next = jest.fn();
+
+    await expect(authGuard(req as any, null as any, next)).rejects.toThrow();
+
+    expect(next).not.toHaveBeenCalled();
   });
 
   it('authGuard should set user and call next() when cookie present', async () => {

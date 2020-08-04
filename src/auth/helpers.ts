@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Unauthorized, AppError } from '../utils';
 import env from '../env';
 
-interface Token {
+export interface Token {
   payload: any;
   createdAt: number;
 }
@@ -26,10 +26,14 @@ export async function unseal(sealedToken: string) {
     Iron.defaults
   );
 
+  if (!token.createdAt || isNaN(token.createdAt)) {
+    throw new Unauthorized();
+  }
+
   const expiresAt = token.createdAt + ms(env.TOKEN_MAX_AGE);
 
   if (Date.now() >= expiresAt) {
-    throw new Unauthorized('Session expired');
+    throw new Unauthorized('Token expired');
   }
 
   return token.payload;
@@ -53,7 +57,7 @@ export async function unsealRequest(req: Request) {
   }
 
   if (!token) {
-    throw new Unauthorized();
+    throw new Unauthorized('Token not found');
   }
 
   const payload = await unseal(token);

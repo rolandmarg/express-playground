@@ -21,7 +21,7 @@ jest.mock('../../auth/google', () => ({
 }));
 
 jest.mock('../../env', () => ({
-  COOKIE_MAX_AGE: '1s',
+  COOKIE_MAX_AGE: '1d',
   TOKEN_MAX_AGE: '100ms',
   TOKEN_SECRET: 'Password string too short (min 32 characters required)',
 }));
@@ -99,18 +99,6 @@ describe('Auth e2e tests', () => {
 
     expect(res.status).toBe(401);
 
-    expect(res.text).toBe('Session expired');
-  });
-
-  it('/secret should return 401 after cookie expires', async () => {
-    await agent.get('/auth/google/callback');
-
-    await sleep(ms(env.COOKIE_MAX_AGE));
-
-    const res = await agent.get('/secret');
-
-    expect(res.status).toBe(401);
-
-    expect(res.text).toBe('Unauthorized');
+    expect(res.text).toBe('Token expired');
   });
 });
