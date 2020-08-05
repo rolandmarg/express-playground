@@ -46,6 +46,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
     const next = field.resolve || defaultFieldResolver;
     field.resolve = async function (result, args, context, info) {
       const user = await unsealRequest(context.req);
+
       return next(result, args, { ...context, user }, info);
     };
   }

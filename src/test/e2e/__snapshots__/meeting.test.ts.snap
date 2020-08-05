@@ -1,0 +1,80 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Meeting e2e tests should create a new meeting 1`] = `
+Object {
+  "data": Object {
+    "createMeeting": Object {
+      "meeting": Object {
+        "endsAt": Any<String>,
+        "id": Any<String>,
+        "startsAt": Any<String>,
+        "title": "testMeeting",
+      },
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting e2e tests should fetch all meetings 1`] = `
+Object {
+  "data": Object {
+    "meetings": Array [
+      Object {
+        "endsAt": Any<String>,
+        "id": Any<String>,
+        "startsAt": Any<String>,
+        "title": "testMeeting",
+      },
+    ],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting e2e tests should fetch empty list of meetings 1`] = `
+Object {
+  "data": Object {
+    "meetings": Array [],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting e2e tests should fetch specific meeting 1`] = `
+Object {
+  "data": Object {
+    "meeting": Object {
+      "endsAt": Any<String>,
+      "id": Any<String>,
+      "startsAt": Any<String>,
+      "title": "testMeeting",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

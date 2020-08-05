@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User e2e tests should fetch all users 1`] = `
+Object {
+  "data": Object {
+    "users": Array [
+      Object {
+        "createdAt": Any<String>,
+        "email": "test@gmail.com",
+        "id": Any<String>,
+      },
+    ],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`User e2e tests should fetch empty list of users 1`] = `
+Object {
+  "data": Object {
+    "users": Array [],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`User e2e tests should fetch specific user 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "createdAt": Any<String>,
+      "email": "test@gmail.com",
+      "id": Any<String>,
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

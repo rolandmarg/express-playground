@@ -1,6 +1,6 @@
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth';
-import { User, getManager } from '../db';
+import { getRepository, User } from '../db';
 import { Unauthorized } from '../utils';
 import env from '../env';
 
@@ -12,16 +12,17 @@ passport.use(
       callbackURL: 'http://localhost:3000/auth/google/callback',
     },
     async (_accessToken, _refreshToken, profile, done) => {
+      const userRepo = getRepository(User);
+
       if (!profile.emails || !profile.emails.length) {
         return done(new Unauthorized('Email not provided'), null);
       }
 
       const email = profile.emails[0].value;
 
-      let user = await getManager().findOne(User, { email });
+      let user = await userRepo.findOne({ email });
       if (!user) {
-        user = await getManager().create(User, { email });
-        await getManager().save(user);
+        user = await userRepo.save({ email });
       }
 
       return done(null, user);

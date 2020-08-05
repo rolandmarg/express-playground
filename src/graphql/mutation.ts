@@ -7,7 +7,7 @@ export const createMeeting = gql`
     $startsAt: String!
     $endsAt: String!
   ) {
-    createCalendarEvent(
+    createMeeting(
       input: { title: $title, startsAt: $startsAt, endsAt: $endsAt }
     ) {
       meeting {
