@@ -12,7 +12,7 @@ export interface IContext {
   user?: User;
 }
 
-const apolloServer = new ApolloServer({
+export const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
   schemaDirectives: { auth: AuthDirective },
