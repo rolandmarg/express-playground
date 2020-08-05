@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import 'reflect-metadata';
 import 'express-async-errors';
-import { apollo } from './graphql/apollo';
+import { apollo } from './graphql';
 import { routes } from './routes';
 
 const app = express();

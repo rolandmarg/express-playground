@@ -22,7 +22,7 @@ const env = {
 };
 
 Object.entries(env).forEach(([key, value]) => {
-  if (!value) {
+  if (!value && key != 'NODE_ENV') {
     throw new AppError(`process.env.${key} not set`);
   }
 });

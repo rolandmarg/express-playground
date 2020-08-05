@@ -1,6 +1,5 @@
 import type { Resolvers } from './types';
-import { getManager } from 'typeorm';
-import { Meeting, User } from '../entity';
+import { Meeting, User, getManager } from '../db';
 
 export const resolvers: Resolvers = {
   Query: {

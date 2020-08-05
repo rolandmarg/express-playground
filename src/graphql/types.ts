@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { User as UserEntity, Meeting as MeetingEntity } from '../entity';
-import { IContext } from '../graphql/apollo';
+import { User as UserEntity, Meeting as MeetingEntity } from '../db';
+import { IContext } from '../graphql';
 export type Maybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;

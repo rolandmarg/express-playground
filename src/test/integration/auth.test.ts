@@ -8,7 +8,7 @@ import {
   cookieAuth,
   logout,
   Token,
-} from '../../auth/helpers';
+} from '../../auth';
 import env from '../../env';
 
 const testUser = {
@@ -17,8 +17,8 @@ const testUser = {
 };
 
 jest.mock('../../env', () => ({
-  COOKIE_MAX_AGE: '1s',
-  TOKEN_MAX_AGE: '10ms',
+  COOKIE_MAX_AGE: '1d',
+  TOKEN_MAX_AGE: '100ms',
   TOKEN_SECRET: 'Password string too short (min 32 characters required)',
 }));
 
