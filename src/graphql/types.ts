@@ -50,7 +50,7 @@ export type Query = {
   __typename?: 'Query';
   user?: Maybe<User>;
   users: Array<User>;
-  viewer?: Maybe<User>;
+  me?: Maybe<User>;
   meetings: Array<Meeting>;
   meeting?: Maybe<Meeting>;
 };
@@ -208,7 +208,7 @@ export type CreateMeetingPayloadResolvers<ContextType = IContext, ParentType ext
 export type QueryResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
-  viewer?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   meetings?: Resolver<Array<ResolversTypes['Meeting']>, ParentType, ContextType>;
   meeting?: Resolver<Maybe<ResolversTypes['Meeting']>, ParentType, ContextType, RequireFields<QueryMeetingArgs, 'id'>>;
 }>;

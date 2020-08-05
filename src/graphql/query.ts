@@ -1,9 +1,9 @@
 import { gql } from 'apollo-server-express';
 import * as fragments from './fragments';
 
-export const viewer = gql`
-  query Viewer {
-    viewer {
+export const me = gql`
+  query Me {
+    me {
       ...UserFields
     }
   }

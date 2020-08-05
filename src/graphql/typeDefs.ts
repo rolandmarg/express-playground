@@ -34,7 +34,7 @@ export const typeDefs = gql`
   type Query {
     user(id: ID!): User
     users: [User!]!
-    viewer: User @auth
+    me: User @auth
     meetings: [Meeting!]!
     meeting(id: ID!): Meeting
   }

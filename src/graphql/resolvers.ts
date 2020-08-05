@@ -4,7 +4,7 @@ import { Meeting, User } from '../entity';
 
 export const resolvers: Resolvers = {
   Query: {
-    async viewer(_parent, _args, context) {
+    async me(_parent, _args, context) {
       return context.user;
     },
     async user(_parent, args) {
