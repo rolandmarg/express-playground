@@ -1,22 +1,32 @@
-import Iron from '@hapi/iron';
-import {
-  seal,
-  unseal,
-  sealResponse,
-  unsealRequest,
-  authGuard,
-  cookieAuth,
-  logout,
-  Token,
-} from '../../auth';
-import { connect, close, User, Provider } from '../../db';
-import env from '../../env';
+import ms from 'ms';
+import supertest from 'supertest';
 import { getManager } from 'typeorm';
+import app from '../../app';
+import { connect, close, User, Provider } from '../../db';
+import { googleAuth, googleAuthCallback } from '../../auth/google';
+import env from '../../env';
+import { sleep } from '../../utils';
 
 const testUser = {
   id: 1,
   email: 'test@gmail.com',
 };
+
+jest.mock('../../auth/google', () => ({
+  googleAuth: jest.fn((_req, _res, next) => {
+    next();
+  }),
+  googleAuthCallback: jest.fn((req, _res, next) => {
+    const testProvider = new Provider();
+    testProvider.provider = 'test';
+    testProvider.providerId = '123';
+    testProvider.email = testUser.email;
+    testProvider.accessToken = 'testAccess';
+
+    req.user = testProvider;
+    next();
+  }),
+}));
 
 jest.mock('../../env', () => ({
   DB_URL: 'postgresql://rem@localhost:5432/midnightest',
@@ -25,7 +35,10 @@ jest.mock('../../env', () => ({
   TOKEN_SECRET: 'Password string too short (min 32 characters required)',
 }));
 
-describe('Auth integration tests', () => {
+describe('Auth API', () => {
+  let req: ReturnType<typeof supertest>;
+  let agent: ReturnType<typeof supertest.agent>;
+
   beforeAll(async () => {
     await connect();
   });
@@ -35,220 +48,77 @@ describe('Auth integration tests', () => {
   });
 
   beforeEach(async () => {
+    req = supertest(app);
+    agent = supertest.agent(app);
+
     await getManager().delete(Provider, {});
     await getManager().delete(User, {});
   });
 
-  it('unsealRequest should throw when no token', async () => {
-    const req = { cookies: {}, get: jest.fn() };
+  it('/secret should return 401 without auth', async () => {
+    const res = await req.get('/secret');
 
-    await expect(unsealRequest(req as any)).rejects.toThrow();
+    expect(res.status).toBe(401);
   });
 
-  it('unsealRequest should prioritize cookies over header', async () => {
-    const token = await seal(testUser);
-    const req = {
-      cookies: {
-        get sid() {
-          return token;
-        },
-      },
-      get: jest.fn(() => `Bearer ${token}`),
-    };
-    const cookieSpy = jest.spyOn(req.cookies, 'sid', 'get');
+  it('/auth/google should invoke googleAuth middleware', async () => {
+    await req.get('/auth/google');
 
-    await unsealRequest(req as any);
-
-    expect(cookieSpy).toHaveBeenCalled();
-    expect(req.get).not.toHaveBeenCalled();
+    expect(googleAuth).toHaveBeenCalled();
   });
 
-  it('unsealRequest should fall back to header when no cookie', async () => {
-    const token = await seal(testUser);
-    const req = {
-      cookies: {
-        get sid() {
-          return;
-        },
-      },
-      get: jest.fn(() => `Bearer ${token}`),
-    };
+  it('/auth/google/callback should set cookie and redirect', async () => {
+    const res = await req.get('/auth/google/callback');
 
-    await unsealRequest(req as any);
-
-    expect(req.get).toHaveBeenCalled();
+    expect(res.status).toBe(302);
+    expect(googleAuthCallback).toHaveBeenCalled();
+    expect(res.header['set-cookie'][0]).toContain('sid');
+    expect(res.header['set-cookie'][0]).toContain('HttpOnly');
   });
 
-  it('unsealRequest should unseal auth header token', async () => {
-    const token = await seal(testUser);
-    const req = {
-      cookies: {
-        get sid() {
-          return;
-        },
-      },
-      get: jest.fn(() => `Bearer ${token}`),
-    };
+  it('/secret should accept cookies', async () => {
+    await agent.get('/auth/google/callback');
 
-    const payload = await unsealRequest(req as any);
+    const res = await agent.get('/secret');
 
-    expect(payload).toEqual(testUser);
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ email: testUser.email });
   });
 
-  it('unsealRequest should unseal cookie token', async () => {
-    const token = await seal(testUser);
-    const req = {
-      cookies: {
-        get sid() {
-          return token;
-        },
-      },
-    };
+  it('/secret should accept Authorization header', async () => {
+    let res = await req.get('/auth/google/callback');
 
-    const payload = await unsealRequest(req as any);
+    const rawCookie = res.header['set-cookie'][0];
 
-    expect(payload).toEqual(testUser);
+    const token = rawCookie.substring(
+      rawCookie.indexOf('=') + 1,
+      rawCookie.indexOf(';')
+    );
+
+    res = await req.get('/secret').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ email: testUser.email });
   });
 
-  it('sealResponse should set a token as cookie', async () => {
-    const res = { cookie: jest.fn() };
+  it('/logout should clear cookie', async () => {
+    await agent.get('/auth/google/callback');
+    await agent.get('/logout');
 
-    await expect(sealResponse(res as any, testUser)).resolves.not.toThrow();
+    const res = await agent.get('/secret');
 
-    expect(res.cookie).toHaveBeenCalled();
-
-    const cookieName = res.cookie.mock.calls[0][0];
-    const token = res.cookie.mock.calls[0][1];
-    const payload = await unseal(token);
-
-    expect(cookieName).toBe('sid');
-    expect(payload).toEqual(testUser);
+    expect(res.status).toBe(401);
   });
 
-  it('authGuard should throw on no token', async () => {
-    const req = {
-      cookies: {
-        get sid() {
-          return;
-        },
-      },
-    };
-    const next = jest.fn();
+  it('/secret should return 401 after token expires', async () => {
+    await agent.get('/auth/google/callback');
 
-    await expect(authGuard(req as any, null as any, next)).rejects.toThrow();
+    await sleep(ms(env.TOKEN_MAX_AGE));
 
-    expect(next).not.toHaveBeenCalled();
-  });
+    const res = await agent.get('/secret');
 
-  it('authGuard should throw on no payload', async () => {
-    const token: Token = {
-      createdAt: Date.now(),
-      payload: null,
-    };
-    const sealedToken = await Iron.seal(token, env.TOKEN_SECRET, Iron.defaults);
+    expect(res.status).toBe(401);
 
-    const req = {
-      cookies: {
-        get sid() {
-          return sealedToken;
-        },
-      },
-    };
-    const next = jest.fn();
-
-    await expect(authGuard(req as any, null as any, next)).rejects.toThrow();
-
-    expect(next).not.toHaveBeenCalled();
-  });
-
-  it('authGuard should set user and call next() when cookie present', async () => {
-    const token = await seal(testUser);
-    const req = {
-      _user: null,
-
-      set user(value: any) {
-        this._user = value;
-      },
-      cookies: {
-        get sid() {
-          return token;
-        },
-      },
-    };
-    const userSpy = jest.spyOn(req, 'user', 'set');
-    const next = jest.fn();
-
-    await expect(
-      authGuard(req as any, null as any, next)
-    ).resolves.not.toThrow();
-
-    expect(next).toHaveBeenCalled();
-    expect(userSpy).toHaveBeenCalled();
-    expect(req._user).toEqual(testUser);
-  });
-
-  it('authGuard should set user and call next() when auth header present', async () => {
-    const token = await seal(testUser);
-    const req = {
-      _user: null,
-
-      set user(value: any) {
-        this._user = value;
-      },
-      cookies: {
-        get sid() {
-          return;
-        },
-      },
-      get: jest.fn(() => `Bearer ${token}`),
-    };
-    const userSpy = jest.spyOn(req, 'user', 'set');
-    const next = jest.fn();
-
-    await expect(
-      authGuard(req as any, null as any, next)
-    ).resolves.not.toThrow();
-
-    expect(next).toHaveBeenCalled();
-    expect(req.get).toHaveBeenCalled();
-    expect(userSpy).toHaveBeenCalled();
-    expect(req._user).toEqual(testUser);
-  });
-
-  it('cookieAuth should set cookie and redirect', async () => {
-    const testProvider = new Provider();
-    testProvider.accessToken = 'testAccess';
-    testProvider.displayName = 'testDisplayName';
-    testProvider.email = testUser.email;
-    testProvider.fullName = 'test test';
-    testProvider.gender = 'm';
-    testProvider.provider = 'test';
-    testProvider.providerId = '123';
-    const req = { user: testProvider };
-    const res = { cookie: jest.fn(), redirect: jest.fn() };
-
-    await expect(cookieAuth(req as any, res as any)).resolves.not.toThrow();
-
-    expect(res.cookie).toHaveBeenCalled();
-    expect(res.redirect).toHaveBeenCalled();
-
-    const cookieName = res.cookie.mock.calls[0][0];
-    const token = res.cookie.mock.calls[0][1];
-    const payload = await unseal(token);
-
-    expect(cookieName).toBe('sid');
-    expect(payload).toMatchObject({ email: testUser.email });
-  });
-
-  it('logout should clear cookie and redirect', async () => {
-    const res = { clearCookie: jest.fn(), redirect: jest.fn() };
-
-    await expect(logout(null as any, res as any)).resolves.not.toThrow();
-
-    expect(res.clearCookie).toHaveBeenCalled();
-    expect(res.redirect).toHaveBeenCalled();
-
-    const cookieName = res.clearCookie.mock.calls[0][0];
-    expect(cookieName).toBe('sid');
+    expect(res.text).toBe('Token expired');
   });
 });

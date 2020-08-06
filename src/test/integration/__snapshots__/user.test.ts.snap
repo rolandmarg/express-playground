@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`User e2e tests should fetch all users 1`] = `
+exports[`User operations should fetch all users 1`] = `
 Object {
   "data": Object {
     "users": Array [
@@ -21,7 +21,7 @@ Object {
 }
 `;
 
-exports[`User e2e tests should fetch empty list of users 1`] = `
+exports[`User operations should fetch empty list of users 1`] = `
 Object {
   "data": Object {
     "users": Array [],
@@ -36,7 +36,7 @@ Object {
 }
 `;
 
-exports[`User e2e tests should fetch specific user 1`] = `
+exports[`User operations should fetch specific user 1`] = `
 Object {
   "data": Object {
     "user": Object {

@@ -9,7 +9,7 @@ jest.mock('../../env', () => ({
 
 const { query } = createTestClient(apolloServer);
 
-describe('User e2e tests', () => {
+describe('User operations', () => {
   let userRepo: Repository<User>;
 
   beforeAll(async () => {

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Meeting e2e tests should create a new meeting 1`] = `
+exports[`Meeting operations should create a new meeting 1`] = `
 Object {
   "data": Object {
     "createMeeting": Object {
@@ -22,7 +22,22 @@ Object {
 }
 `;
 
-exports[`Meeting e2e tests should fetch all meetings 1`] = `
+exports[`Meeting operations should fetch empty list of meetings 1`] = `
+Object {
+  "data": Object {
+    "meetings": Array [],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations should fetch freshly created meetings from database 1`] = `
 Object {
   "data": Object {
     "meetings": Array [
@@ -44,22 +59,7 @@ Object {
 }
 `;
 
-exports[`Meeting e2e tests should fetch empty list of meetings 1`] = `
-Object {
-  "data": Object {
-    "meetings": Array [],
-  },
-  "errors": undefined,
-  "extensions": undefined,
-  "http": Object {
-    "headers": Headers {
-      Symbol(map): Object {},
-    },
-  },
-}
-`;
-
-exports[`Meeting e2e tests should fetch specific meeting 1`] = `
+exports[`Meeting operations should fetch specific meeting 1`] = `
 Object {
   "data": Object {
     "meeting": Object {

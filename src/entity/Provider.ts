@@ -27,8 +27,8 @@ export class Provider {
   @Column({ nullable: true })
   photo?: string;
 
-  @Column()
-  displayName!: string;
+  @Column({ nullable: true })
+  displayName?: string;
 
   @Column({ nullable: true })
   fullName?: string;

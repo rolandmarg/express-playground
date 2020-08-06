@@ -9,7 +9,7 @@ jest.mock('../../env', () => ({
 
 const { query, mutate } = createTestClient(apolloServer);
 
-describe('Meeting e2e tests', () => {
+describe('Meeting operations', () => {
   let meetingRepo: Repository<Meeting>;
 
   beforeAll(async () => {
@@ -25,7 +25,7 @@ describe('Meeting e2e tests', () => {
     await meetingRepo.clear();
   });
 
-  it('should fetch all meetings', async () => {
+  it('should fetch freshly created meetings from database', async () => {
     const title = 'testMeeting';
     await meetingRepo.save({ title, startsAt: new Date(), endsAt: new Date() });
 
