@@ -1,6 +1,8 @@
 import ms from 'ms';
 import supertest from 'supertest';
+import { getManager } from 'typeorm';
 import app from '../../app';
+import { connect, close, User, Provider } from '../../db';
 import { googleAuth, googleAuthCallback } from '../../auth/google';
 import env from '../../env';
 import { sleep } from '../../utils';
@@ -10,17 +12,27 @@ const testUser = {
   email: 'test@gmail.com',
 };
 
+const testProvider = new Provider();
+testProvider.accessToken = 'testAccess';
+testProvider.displayName = 'testDisplayName';
+testProvider.email = testUser.email;
+testProvider.fullName = 'test test';
+testProvider.gender = 'm';
+testProvider.provider = 'test';
+testProvider.providerId = '123';
+
 jest.mock('../../auth/google', () => ({
   googleAuth: jest.fn((_req, _res, next) => {
     next();
   }),
   googleAuthCallback: jest.fn((req, _res, next) => {
-    req.user = testUser;
+    req.user = testProvider;
     next();
   }),
 }));
 
 jest.mock('../../env', () => ({
+  DB_URL: 'postgresql://rem@localhost:5432/midnightest',
   COOKIE_MAX_AGE: '1d',
   TOKEN_MAX_AGE: '100ms',
   TOKEN_SECRET: 'Password string too short (min 32 characters required)',
@@ -30,9 +42,19 @@ describe('Auth e2e tests', () => {
   let req: ReturnType<typeof supertest>;
   let agent: ReturnType<typeof supertest.agent>;
 
-  beforeEach(() => {
+  beforeAll(async () => {
+    await connect();
+  });
+
+  afterAll(async () => {
+    await close();
+  });
+
+  beforeEach(async () => {
     req = supertest(app);
     agent = supertest.agent(app);
+    await getManager().delete(Provider, {});
+    await getManager().delete(User, {});
   });
 
   it('/secret should return 401', async () => {
@@ -62,7 +84,7 @@ describe('Auth e2e tests', () => {
     const res = await agent.get('/secret');
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual(testUser);
+    expect(res.body).toMatchObject({ email: testUser.email });
   });
 
   it('/secret should accept Authorization Bearer header', async () => {
@@ -78,7 +100,7 @@ describe('Auth e2e tests', () => {
     res = await req.get('/secret').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual(testUser);
+    expect(res.body).toMatchObject({ email: testUser.email });
   });
 
   it('/logout should clear cookie', async () => {

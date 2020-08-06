@@ -9,7 +9,9 @@ import {
   logout,
   Token,
 } from '../../auth';
+import { connect, close, User, Provider } from '../../db';
 import env from '../../env';
+import { getManager } from 'typeorm';
 
 const testUser = {
   id: 1,
@@ -17,12 +19,26 @@ const testUser = {
 };
 
 jest.mock('../../env', () => ({
+  DB_URL: 'postgresql://rem@localhost:5432/midnightest',
   COOKIE_MAX_AGE: '1d',
   TOKEN_MAX_AGE: '100ms',
   TOKEN_SECRET: 'Password string too short (min 32 characters required)',
 }));
 
 describe('Auth integration tests', () => {
+  beforeAll(async () => {
+    await connect();
+  });
+
+  afterAll(async () => {
+    await close();
+  });
+
+  beforeEach(async () => {
+    await getManager().delete(Provider, {});
+    await getManager().delete(User, {});
+  });
+
   it('unsealRequest should throw when no token', async () => {
     const req = { cookies: {}, get: jest.fn() };
 
@@ -200,7 +216,15 @@ describe('Auth integration tests', () => {
   });
 
   it('cookieAuth should set cookie and redirect', async () => {
-    const req = { user: testUser };
+    const testProvider = new Provider();
+    testProvider.accessToken = 'testAccess';
+    testProvider.displayName = 'testDisplayName';
+    testProvider.email = testUser.email;
+    testProvider.fullName = 'test test';
+    testProvider.gender = 'm';
+    testProvider.provider = 'test';
+    testProvider.providerId = '123';
+    const req = { user: testProvider };
     const res = { cookie: jest.fn(), redirect: jest.fn() };
 
     await expect(cookieAuth(req as any, res as any)).resolves.not.toThrow();
@@ -213,7 +237,7 @@ describe('Auth integration tests', () => {
     const payload = await unseal(token);
 
     expect(cookieName).toBe('sid');
-    expect(payload).toEqual(testUser);
+    expect(payload).toMatchObject({ email: testUser.email });
   });
 
   it('logout should clear cookie and redirect', async () => {

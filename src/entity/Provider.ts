@@ -33,6 +33,6 @@ export class Provider {
   @Column({ nullable: true })
   fullName?: string;
 
-  @ManyToOne(() => User, (user) => user.providers)
+  @ManyToOne(() => User, (user) => user.providers, { onDelete: 'CASCADE' })
   user!: User;
 }

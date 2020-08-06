@@ -22,7 +22,7 @@ describe('User e2e tests', () => {
   });
 
   beforeEach(async () => {
-    await userRepo.clear();
+    await userRepo.delete({});
   });
 
   it('should fetch all users', async () => {
