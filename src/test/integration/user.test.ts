@@ -1,6 +1,5 @@
-import { Repository, getRepository } from 'typeorm';
 import { createTestClient } from 'apollo-server-testing';
-import { connect, close, User } from '../../db';
+import { connect, close, User, getManager } from '../../db';
 import { apolloServer, queries } from '../../graphql';
 
 jest.mock('../../env', () => ({
@@ -10,11 +9,8 @@ jest.mock('../../env', () => ({
 const { query } = createTestClient(apolloServer);
 
 describe('User operations', () => {
-  let userRepo: Repository<User>;
-
   beforeAll(async () => {
     await connect();
-    userRepo = getRepository(User);
   });
 
   afterAll(async () => {
@@ -22,12 +18,14 @@ describe('User operations', () => {
   });
 
   beforeEach(async () => {
-    await userRepo.delete({});
+    await getManager().delete(User, {});
   });
 
   it('should fetch all users', async () => {
-    const email = 'test@gmail.com';
-    await userRepo.save({ email });
+    const user = new User();
+    user.email = 'test@gmail.com';
+
+    await getManager().save(user);
 
     const res = await query({ query: queries.users });
 
@@ -37,7 +35,7 @@ describe('User operations', () => {
           {
             id: expect.any(String),
             createdAt: expect.any(String),
-            email,
+            email: user.email,
           },
         ],
       },
@@ -51,8 +49,10 @@ describe('User operations', () => {
   });
 
   it('should fetch specific user', async () => {
-    const email = 'test@gmail.com';
-    const user = await userRepo.save({ email });
+    const user = new User();
+    user.email = 'test@gmail.com';
+
+    await getManager().save(user);
 
     const res = await query({
       query: queries.user,
@@ -64,7 +64,7 @@ describe('User operations', () => {
         user: {
           id: expect.any(String),
           createdAt: expect.any(String),
-          email,
+          email: user.email,
         },
       },
     });

@@ -1,6 +1,5 @@
 import type { Resolvers } from './types';
-import { Meeting, User } from '../db';
-import { getRepository } from 'typeorm';
+import { meetingRepo, getManager, User, Meeting } from '../db';
 
 export const resolvers: Resolvers = {
   Query: {
@@ -8,42 +7,43 @@ export const resolvers: Resolvers = {
       return context.user;
     },
     async user(_parent, args) {
-      const user = await getRepository(User).findOne(args.id, {
-        relations: ['providers'],
-      });
+      const user = await getManager().findOne(User, args.id);
 
       return user;
     },
     async users() {
-      const users = await getRepository(User).find({
-        relations: ['providers'],
-      });
+      const users = await getManager().find(User);
 
       return users;
     },
     async meeting(_parent, args) {
-      const meeting = await getRepository(Meeting).findOne(args.id);
+      const meeting = await getManager().findOne(Meeting, args.id);
 
       return meeting;
     },
-    async meetings() {
-      const meetings = await getRepository(Meeting).find();
+    async meetings(_parent, args) {
+      const meetingsConnection = await meetingRepo.getPaginated({
+        first: args.first,
+        after: args.after,
+      });
 
-      return meetings;
+      return meetingsConnection;
     },
   },
   Mutation: {
     async createMeeting(_parent, args) {
-      const meeting = getRepository(Meeting).save({
-        title: args.input.title,
-        startsAt: args.input.startsAt,
-        endsAt: args.input.endsAt,
-      });
+      const meeting = new Meeting();
+
+      meeting.title = args.input.title;
+      meeting.startsAt = new Date(args.input.startsAt);
+      meeting.endsAt = new Date(args.input.endsAt);
+
+      await getManager().save(meeting);
 
       return { meeting };
     },
     async deleteMeetings() {
-      const result = await getRepository(Meeting).delete({});
+      const result = await getManager().delete(Meeting, {});
 
       return !!result.affected;
     },

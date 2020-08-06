@@ -16,3 +16,12 @@ export const meeting = gql`
     endsAt
   }
 `;
+
+export const pageInfo = gql`
+  fragment PageInfoFields on PageInfo {
+    startCursor
+    endCursor
+    hasNextPage
+    hasPreviousPage
+  }
+`;

@@ -1,8 +1,7 @@
 import ms from 'ms';
 import supertest from 'supertest';
-import { getManager } from 'typeorm';
 import app from '../../app';
-import { connect, close, User, Provider } from '../../db';
+import { connect, close, User, Provider, getManager } from '../../db';
 import { googleAuth, googleAuthCallback } from '../../auth/google';
 import env from '../../env';
 import { sleep } from '../../utils';

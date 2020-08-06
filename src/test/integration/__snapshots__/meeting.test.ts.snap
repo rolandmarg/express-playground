@@ -25,7 +25,15 @@ Object {
 exports[`Meeting operations should fetch empty list of meetings 1`] = `
 Object {
   "data": Object {
-    "meetings": Array [],
+    "meetings": Object {
+      "edges": Array [],
+      "pageInfo": Object {
+        "endCursor": null,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": null,
+      },
+    },
   },
   "errors": undefined,
   "extensions": undefined,
@@ -37,17 +45,28 @@ Object {
 }
 `;
 
-exports[`Meeting operations should fetch freshly created meetings from database 1`] = `
+exports[`Meeting operations should fetch freshly created meeting from database 1`] = `
 Object {
   "data": Object {
-    "meetings": Array [
-      Object {
-        "endsAt": Any<String>,
-        "id": Any<String>,
-        "startsAt": Any<String>,
-        "title": "testMeeting",
+    "meetings": Object {
+      "edges": Array [
+        Object {
+          "cursor": Any<String>,
+          "node": Object {
+            "endsAt": Any<String>,
+            "id": Any<String>,
+            "startsAt": Any<String>,
+            "title": "testMeeting",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": Any<String>,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": Any<String>,
       },
-    ],
+    },
   },
   "errors": undefined,
   "extensions": undefined,

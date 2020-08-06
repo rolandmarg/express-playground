@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 
 @Entity({ name: 'meetings' })
 export class Meeting {
@@ -8,6 +8,7 @@ export class Meeting {
   @Column()
   title!: string;
 
+  @Index()
   @Column()
   startsAt!: Date;
 

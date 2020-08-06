@@ -3,6 +3,13 @@ import { gql } from 'apollo-server-express';
 export const typeDefs = gql`
   directive @auth on OBJECT | FIELD_DEFINITION
 
+  type PageInfo {
+    startCursor: String
+    endCursor: String
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+  }
+
   type Provider {
     id: ID!
     providerId: String!
@@ -30,6 +37,16 @@ export const typeDefs = gql`
     endsAt: String!
   }
 
+  type MeetingEdge {
+    node: Meeting!
+    cursor: String!
+  }
+
+  type MeetingsConnection {
+    edges: [MeetingEdge!]!
+    pageInfo: PageInfo!
+  }
+
   input CreateMeetingInput {
     title: String!
     startsAt: String!
@@ -49,7 +66,11 @@ export const typeDefs = gql`
     user(id: ID!): User
     users: [User!]!
     me: User @auth
-    meetings: [Meeting!]!
+    """
+    after parameter maybe opaque cursor passed from server, or date
+    to be used in 'where meeting.startsAt > date'
+    """
+    meetings(first: Int!, after: String): MeetingsConnection!
     meeting(id: ID!): Meeting
   }
 

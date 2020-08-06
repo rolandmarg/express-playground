@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { getManager } from 'typeorm';
 import env from '../env';
 import { Unauthorized } from '../utils';
-import { User, Provider } from '../db';
+import { User, Provider, getManager } from '../db';
 import { unsealRequest, sealResponse } from './helpers';
 
 export * from './helpers';

@@ -29,7 +29,7 @@ export const users = gql`
 `;
 
 export const meeting = gql`
-  query meeting($id: ID!) {
+  query Meeting($id: ID!) {
     meeting(id: $id) {
       ...MeetingFields
     }
@@ -38,10 +38,19 @@ export const meeting = gql`
 `;
 
 export const meetings = gql`
-  query meetings {
-    meetings {
-      ...MeetingFields
+  query Meetings($first: Int!, $after: String) {
+    meetings(first: $first, after: $after) {
+      edges {
+        node {
+          ...MeetingFields
+        }
+        cursor
+      }
+      pageInfo {
+        ...PageInfoFields
+      }
     }
   }
   ${fragments.meeting}
+  ${fragments.pageInfo}
 `;
