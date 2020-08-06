@@ -1,8 +1,38 @@
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth';
-import { getRepository, User } from '../db';
-import { Unauthorized } from '../utils';
+import { Provider } from '../db';
 import env from '../env';
+
+const normalizeProvider = (
+  accessToken: string,
+  refreshToken: string,
+  profile: GoogleStrategy.Profile
+) => {
+  const provider = new Provider();
+
+  provider.providerId = profile.id;
+  provider.provider = profile.provider;
+  provider.accessToken = accessToken;
+  provider.refreshToken = refreshToken;
+  provider.displayName = profile.displayName;
+  provider.gender = profile.gender;
+
+  if (profile.emails && profile.emails.length) {
+    provider.email = profile.emails[0].value;
+  }
+
+  if (profile.photos && profile.photos.length) {
+    provider.photo = profile.photos[0].value;
+  }
+
+  const firstName = profile.name?.givenName;
+  const lastName = profile.name?.familyName;
+  if (firstName && lastName) {
+    provider.fullName = firstName + ' ' + lastName;
+  }
+
+  return provider;
+};
 
 passport.use(
   new GoogleStrategy.OAuth2Strategy(
@@ -11,21 +41,10 @@ passport.use(
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       callbackURL: 'http://localhost:3000/auth/google/callback',
     },
-    async (_accessToken, _refreshToken, profile, done) => {
-      const userRepo = getRepository(User);
+    (accessToken, refreshToken, profile, done) => {
+      const provider = normalizeProvider(accessToken, refreshToken, profile);
 
-      if (!profile.emails || !profile.emails.length) {
-        return done(new Unauthorized('Email not provided'), null);
-      }
-
-      const email = profile.emails[0].value;
-
-      let user = await userRepo.findOne({ email });
-      if (!user) {
-        user = await userRepo.save({ email });
-      }
-
-      return done(null, user);
+      return done(null, provider);
     }
   )
 );

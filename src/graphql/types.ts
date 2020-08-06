@@ -15,11 +15,26 @@ export type Scalars = {
 };
 
 
+export type Provider = {
+  __typename?: 'Provider';
+  id: Scalars['ID'];
+  providerId: Scalars['String'];
+  provider: Scalars['String'];
+  email: Scalars['String'];
+  accessToken: Scalars['String'];
+  refreshToken?: Maybe<Scalars['String']>;
+  gender?: Maybe<Scalars['String']>;
+  photo?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+  fullName?: Maybe<Scalars['String']>;
+};
+
 export type User = {
   __typename?: 'User';
   id: Scalars['ID'];
   email: Scalars['String'];
   createdAt: Scalars['String'];
+  providers: Array<Provider>;
 };
 
 export type Meeting = {
@@ -155,9 +170,10 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  User: ResolverTypeWrapper<UserEntity>;
+  Provider: ResolverTypeWrapper<Provider>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  User: ResolverTypeWrapper<UserEntity>;
   Meeting: ResolverTypeWrapper<MeetingEntity>;
   CreateMeetingInput: CreateMeetingInput;
   SignInInput: SignInInput;
@@ -169,9 +185,10 @@ export type ResolversTypes = ResolversObject<{
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  User: UserEntity;
+  Provider: Provider;
   ID: Scalars['ID'];
   String: Scalars['String'];
+  User: UserEntity;
   Meeting: MeetingEntity;
   CreateMeetingInput: CreateMeetingInput;
   SignInInput: SignInInput;
@@ -185,10 +202,25 @@ export type AuthDirectiveArgs = {  };
 
 export type AuthDirectiveResolver<Result, Parent, ContextType = IContext, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
+export type ProviderResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Provider'] = ResolversParentTypes['Provider']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  providerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  provider?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  refreshToken?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  gender?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  photo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  fullName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
 export type UserResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  providers?: Resolver<Array<ResolversTypes['Provider']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
@@ -219,6 +251,7 @@ export type MutationResolvers<ContextType = IContext, ParentType extends Resolve
 }>;
 
 export type Resolvers<ContextType = IContext> = ResolversObject<{
+  Provider?: ProviderResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   Meeting?: MeetingResolvers<ContextType>;
   CreateMeetingPayload?: CreateMeetingPayloadResolvers<ContextType>;

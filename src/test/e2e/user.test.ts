@@ -1,5 +1,6 @@
+import { Repository, getRepository } from 'typeorm';
 import { createTestClient } from 'apollo-server-testing';
-import { connect, close, Repository, getRepository, User } from '../../db';
+import { connect, close, User } from '../../db';
 import { apolloServer, queries } from '../../graphql';
 
 jest.mock('../../env', () => ({

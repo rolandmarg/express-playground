@@ -1,5 +1,6 @@
 import type { Resolvers } from './types';
-import { Meeting, User, getRepository } from '../db';
+import { Meeting, User } from '../db';
+import { getRepository } from 'typeorm';
 
 export const resolvers: Resolvers = {
   Query: {
@@ -7,12 +8,16 @@ export const resolvers: Resolvers = {
       return context.user;
     },
     async user(_parent, args) {
-      const user = await getRepository(User).findOne(args.id);
+      const user = await getRepository(User).findOne(args.id, {
+        relations: ['providers'],
+      });
 
       return user;
     },
     async users() {
-      const users = await getRepository(User).find();
+      const users = await getRepository(User).find({
+        relations: ['providers'],
+      });
 
       return users;
     },

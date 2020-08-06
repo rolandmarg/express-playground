@@ -3,10 +3,24 @@ import { gql } from 'apollo-server-express';
 export const typeDefs = gql`
   directive @auth on OBJECT | FIELD_DEFINITION
 
+  type Provider {
+    id: ID!
+    providerId: String!
+    provider: String!
+    email: String!
+    accessToken: String!
+    refreshToken: String
+    gender: String
+    photo: String
+    displayName: String
+    fullName: String
+  }
+
   type User {
     id: ID!
     email: String!
     createdAt: String!
+    providers: [Provider!]!
   }
 
   type Meeting {

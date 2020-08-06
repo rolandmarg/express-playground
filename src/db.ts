@@ -3,8 +3,9 @@ import env from './env';
 
 import { User } from './entity/User';
 import { Meeting } from './entity/Meeting';
+import { Provider } from './entity/Provider';
 
-export { User, Meeting };
+export { User, Meeting, Provider };
 
 let connection: Connection;
 
@@ -13,7 +14,7 @@ export const connect = async () => {
     type: 'postgres',
     url: env.DB_URL,
     synchronize: env.NODE_ENV !== 'production',
-    entities: [User, Meeting],
+    entities: [User, Meeting, Provider],
     logging: ['info'],
   });
 
@@ -23,5 +24,3 @@ export const connect = async () => {
 export const close = async () => {
   return connection.close();
 };
-
-export * from 'typeorm';

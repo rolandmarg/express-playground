@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/romMidnight/express-playground#readme",
   "scripts": {
+    "start": "yarn generate && tsc && node dist/server.js",
     "dev": "concurrently 'tsc -w' 'node-dev --respawn dist/server.js' 'yarn generate --watch'",
     "build": "tsc",
     "test": "jest",
