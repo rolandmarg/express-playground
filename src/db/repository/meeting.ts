@@ -1,8 +1,6 @@
-import { getConnection } from 'typeorm';
+import { getManager, MoreThan, FindConditions } from 'typeorm';
 import { Meeting } from '../entity/Meeting';
 import { isIsoDate } from '../../utils';
-
-const query = () => getConnection().createQueryBuilder(Meeting, 'meeting');
 
 export const isCursor = (str: string) => {
   const decoded = Buffer.from(str, 'base64').toString('binary');
@@ -51,32 +49,35 @@ interface getPaginatedOptions {
 export const getPaginated = async (options: getPaginatedOptions) => {
   const { first, after } = options;
 
-  let qb = query();
+  const findOpts: FindConditions<Meeting> = {};
 
   if (after && isCursor(after)) {
     const { id, startsAt } = decodeCursor(after);
-    qb = qb
-      .where('meeting.startsAt > :startsAt', { startsAt })
-      .andWhere('meeting.id > :id', { id });
+    findOpts.startsAt = MoreThan(startsAt);
+    findOpts.id = MoreThan(id);
   } else if (after) {
-    qb = qb.where('meeting.startsAt > :after', {
-      after: new Date(after).toISOString(),
-    });
+    findOpts.startsAt = MoreThan(new Date(after).toISOString());
   }
 
-  const nodesPromise = qb
-    .orderBy('meeting.startsAt')
-    .addOrderBy('meeting.id')
-    .take(first)
-    .getMany();
-  const firstMPromise = query()
-    .orderBy('meeting.startsAt')
-    .addOrderBy('meeting.id')
-    .getOne();
-  const lastMPromise = query()
-    .orderBy('meeting.startsAt', 'DESC')
-    .addOrderBy('meeting.id', 'DESC')
-    .getOne();
+  const nodesPromise = getManager().find(Meeting, {
+    where: {
+      ...findOpts,
+    },
+    order: { startsAt: 'ASC', id: 'ASC' },
+    take: first,
+  });
+  const firstMPromise = getManager().findOne(Meeting, {
+    order: {
+      startsAt: 'ASC',
+      id: 'ASC',
+    },
+  });
+  const lastMPromise = getManager().findOne(Meeting, {
+    order: {
+      startsAt: 'DESC',
+      id: 'DESC',
+    },
+  });
 
   const [nodes, firstM, lastM] = await Promise.all([
     nodesPromise,

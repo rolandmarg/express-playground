@@ -17,7 +17,6 @@ export const connect = async () => {
     url: env.DB_URL,
     synchronize: env.NODE_ENV !== 'production',
     entities: [User, Meeting, Provider],
-    logging: ['info'],
   });
 
   return connection;

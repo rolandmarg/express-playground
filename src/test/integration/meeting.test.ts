@@ -154,7 +154,9 @@ describe('Meeting operations', () => {
       variables: { first: numOfMeetings },
     });
 
-    expect(res).toMatchSnapshot(meetingSnapshot(false, false));
+    expect(res).toMatchSnapshot(
+      meetingSnapshot({ hasPreviousPage: false, hasNextPage: false })
+    );
 
     const { edgeLength, edgeCursor, startCursor, endCursor } = parseRes(res);
 
@@ -175,7 +177,9 @@ describe('Meeting operations', () => {
       variables: { first: numOfMeetings },
     });
 
-    expect(res).toMatchSnapshot(meetingSnapshot(true, false));
+    expect(res).toMatchSnapshot(
+      meetingSnapshot({ hasPreviousPage: false, hasNextPage: true })
+    );
 
     const { edgeLength, edgeCursor, startCursor, endCursor } = parseRes(res);
 
@@ -203,7 +207,9 @@ describe('Meeting operations', () => {
       variables: { first: numOfMeetings, after: cursor },
     });
 
-    expect(res).toMatchSnapshot(meetingSnapshot(false, true));
+    expect(res).toMatchSnapshot(
+      meetingSnapshot({ hasPreviousPage: true, hasNextPage: false })
+    );
 
     const { edgeLength, edgeCursor, startCursor, endCursor } = parseRes(res);
 
@@ -232,7 +238,9 @@ describe('Meeting operations', () => {
       variables: { first: numOfMeetings, after: cursor },
     });
 
-    expect(res).toMatchSnapshot(meetingSnapshot(true, true));
+    expect(res).toMatchSnapshot(
+      meetingSnapshot({ hasPreviousPage: true, hasNextPage: true })
+    );
 
     const { edgeLength, edgeCursor, startCursor, endCursor } = parseRes(res);
 
@@ -242,7 +250,7 @@ describe('Meeting operations', () => {
     expect(edgeCursor).not.toBe(endCursor);
   });
 
-  it('should fetch after specific date', async () => {
+  it('prev page should be true after fetching from specific date', async () => {
     await insertMeeting(new Date('1980'));
     await insertMeeting(new Date('2020-02-02'));
     await insertMeeting(new Date('2020-02-02'));
@@ -254,7 +262,13 @@ describe('Meeting operations', () => {
       variables: { first: numOfMeetings, after: '2020' },
     });
 
-    expect(res).toMatchSnapshot(meetingSnapshot(false, true, numOfMeetings));
+    expect(res).toMatchSnapshot(
+      meetingSnapshot({
+        hasPreviousPage: true,
+        hasNextPage: false,
+        numOfMeetings,
+      })
+    );
 
     const { edgeLength } = parseRes(res);
 
@@ -273,11 +287,12 @@ const insertMeeting = async (startsAt?: Date) => {
   return meeting;
 };
 
-const meetingSnapshot = (
-  hasNextPage: boolean,
-  hasPreviousPage: boolean,
-  numOfMeetings = 1
-) => {
+const meetingSnapshot = (options: {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  numOfMeetings?: number;
+}) => {
+  const { hasNextPage, hasPreviousPage, numOfMeetings = 1 } = options;
   const snp = {
     data: {
       meetings: {
