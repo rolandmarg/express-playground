@@ -3,13 +3,12 @@ import { ApolloServer } from 'apollo-server-express';
 import { typeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
 import { AuthDirective } from './authDirective';
-import { User } from '../db';
 import { AppError } from '../utils';
 
 export interface IContext {
   req: Request;
   res: Response;
-  user?: User;
+  auth?: any;
 }
 
 export const apolloServer = new ApolloServer({

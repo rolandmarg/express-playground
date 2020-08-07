@@ -7,6 +7,7 @@ import { Provider } from './entity/Provider';
 
 export * from 'typeorm';
 export * as meetingRepo from './repository/meeting';
+export * as userRepo from './repository/user';
 
 export { User, Meeting, Provider };
 

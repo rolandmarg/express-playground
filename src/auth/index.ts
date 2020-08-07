@@ -1,86 +1,67 @@
-import { Request, Response, NextFunction } from 'express';
+import ms from 'ms';
+import { Request, RequestHandler } from 'express';
 import env from '../env';
 import { Unauthorized } from '../utils';
-import { User, Provider, getManager } from '../db';
-import { unsealRequest, sealResponse } from './helpers';
+
+import { seal, unseal } from './helpers';
+import { userRepo, Provider } from '../db';
 
 export * from './helpers';
+export * from './google';
+export * from './linkedin';
 
-export async function authGuard(
-  req: Request,
-  _res: Response,
-  next: NextFunction
-) {
-  const payload = await unsealRequest(req);
+export const authRequest = async (req: Request) => {
+  const cookieToken = req.cookies['sid'];
+  const authBearerToken = req.get('Authorization')?.split(' ')[1];
+
+  const token = cookieToken || authBearerToken;
+
+  if (!token) {
+    throw new Unauthorized('Token not found');
+  }
+
+  const payload = await unseal(token);
 
   if (!payload) {
     throw new Unauthorized();
   }
 
+  return payload;
+};
+
+export const authMiddleware: RequestHandler = async (req, _res, next) => {
+  const payload = await authRequest(req);
+
   req.user = payload;
 
   next();
-}
-
-const upsertProvider = (providers: Provider[], provider: Provider) => {
-  const existing = providers.find((p) => p.provider === provider.provider);
-  if (!existing) {
-    providers.push(provider);
-
-    return providers;
-  }
-
-  existing.providerId = provider.providerId;
-  existing.email = provider.email;
-  existing.accessToken = provider.accessToken;
-  existing.refreshToken = provider.refreshToken;
-  existing.displayName = provider.displayName;
-  existing.gender = provider.gender;
-  existing.photo = provider.photo;
-  existing.fullName = provider.fullName;
-
-  return providers;
 };
 
-export async function cookieAuth(req: Request, res: Response) {
+export const createSession: RequestHandler = async (req, res) => {
   const provider = req.user as Provider;
 
   if (!provider.email) {
     throw new Unauthorized('Email not provided');
   }
 
-  let user = await getManager().findOne(
-    User,
-    { email: provider.email },
-    { relations: ['providers'] }
-  );
+  const user = await userRepo.upsertByProvider(provider);
 
-  if (!user) {
-    user = new User();
+  const token = await seal({ email: user.email });
 
-    user.email = provider.email;
-    user.providers = [provider];
-
-    await getManager().transaction(async (transactionalManager) => {
-      await transactionalManager.save(provider);
-      await transactionalManager.save(user);
-    });
-  } else {
-    user.providers = upsertProvider(user.providers, provider);
-
-    user = await getManager().save(user);
-  }
-
-  await sealResponse(res, { email: user.email });
+  res.cookie('sid', token, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    maxAge: ms(env.COOKIE_MAX_AGE),
+  });
 
   res.redirect('/secret');
-}
+};
 
-export async function logout(_req: Request, res: Response) {
+export const logout: RequestHandler = (_req, res) => {
   res.clearCookie('sid', {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
   });
 
   res.redirect('/secret');
-}
+};

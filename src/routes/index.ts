@@ -1,6 +1,13 @@
 import { Router, RequestHandler, ErrorRequestHandler } from 'express';
-import { authGuard, cookieAuth, logout } from '../auth';
-import { googleAuth, googleAuthCallback } from '../auth/google';
+import {
+  googleAuth,
+  googleAuthCallback,
+  linkedinAuth,
+  linkedinAuthCallback,
+  authMiddleware,
+  createSession,
+  logout,
+} from '../auth';
 import { AppError } from '../utils';
 
 const sendAuthInfo: RequestHandler = (req, res) => {
@@ -28,8 +35,10 @@ export const routes = () => {
   const router = Router();
 
   router.get('/auth/google', googleAuth);
-  router.get('/auth/google/callback', googleAuthCallback, cookieAuth);
-  router.get('/secret', authGuard, sendAuthInfo);
+  router.get('/auth/google/callback', googleAuthCallback, createSession);
+  router.get('/auth/linkedin', linkedinAuth);
+  router.get('/auth/linkedin/callback', linkedinAuthCallback, createSession);
+  router.get('/secret', authMiddleware, sendAuthInfo);
   router.get('/logout', logout);
 
   router.use(notFound);

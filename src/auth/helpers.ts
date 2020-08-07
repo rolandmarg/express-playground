@@ -1,6 +1,5 @@
 import ms from 'ms';
 import Iron from '@hapi/iron';
-import { Request, Response } from 'express';
 import env from '../env';
 import { AppError, Unauthorized } from '../utils';
 
@@ -51,30 +50,4 @@ export async function unseal(sealedToken: string) {
   }
 
   return token.payload;
-}
-
-export async function sealResponse(res: Response, payload: any) {
-  const token = await seal(payload);
-
-  res.cookie('sid', token, {
-    httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    maxAge: ms(env.COOKIE_MAX_AGE),
-  });
-}
-
-export async function unsealRequest(req: Request) {
-  let token = req.cookies['sid'];
-
-  if (!token) {
-    token = req.get('Authorization')?.split(' ')[1];
-  }
-
-  if (!token) {
-    throw new Unauthorized('Token not found');
-  }
-
-  const payload = await unseal(token);
-
-  return payload;
 }

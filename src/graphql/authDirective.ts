@@ -9,7 +9,7 @@ import {
 
 import { SchemaDirectiveVisitor } from 'apollo-server-express';
 import { IContext } from './apollo';
-import { unsealRequest } from '../auth';
+import { authRequest } from '../auth';
 
 export class AuthDirective extends SchemaDirectiveVisitor {
   public static getDirectiveDeclaration(
@@ -35,9 +35,11 @@ export class AuthDirective extends SchemaDirectiveVisitor {
       const next = field.resolve || defaultFieldResolver;
 
       field.resolve = async function (result, args, context, info) {
-        const user = await unsealRequest(context.req);
+        const payload = await authRequest(context.req);
 
-        return next(result, args, { ...context, user }, info);
+        context.auth = payload;
+
+        return next(result, args, context, info);
       };
     });
   }
@@ -45,9 +47,11 @@ export class AuthDirective extends SchemaDirectiveVisitor {
   public visitFieldDefinition(field: GraphQLField<any, IContext>) {
     const next = field.resolve || defaultFieldResolver;
     field.resolve = async function (result, args, context, info) {
-      const user = await unsealRequest(context.req);
+      const payload = await authRequest(context.req);
 
-      return next(result, args, { ...context, user }, info);
+      context.auth = payload;
+
+      return next(result, args, context, info);
     };
   }
 }

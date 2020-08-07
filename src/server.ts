@@ -7,6 +7,8 @@ async function bootstrap() {
     await connect();
 
     app.listen(3000);
+
+    console.info('server up and running');
   } catch (e) {
     console.error(e);
     process.exit(1);

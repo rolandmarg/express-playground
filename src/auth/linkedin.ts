@@ -1,12 +1,12 @@
 import passport from 'passport';
-import GoogleStrategy from 'passport-google-oauth';
+import LinkedinStrategy from 'passport-linkedin-oauth2';
 import { Provider } from '../db';
 import env from '../env';
 
 const normalizeProvider = (
   accessToken: string,
   refreshToken: string,
-  profile: GoogleStrategy.Profile
+  profile: LinkedinStrategy.Profile
 ) => {
   const provider = new Provider();
 
@@ -34,12 +34,13 @@ const normalizeProvider = (
 };
 
 passport.use(
-  new GoogleStrategy.OAuth2Strategy(
+  new LinkedinStrategy.Strategy(
     {
-      clientID: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/auth/google/callback',
-    },
+      clientID: env.LINKEDIN_CLIENT_ID,
+      clientSecret: env.LINKEDIN_CLIENT_SECRET,
+      callbackURL: 'http://localhost:3000/auth/linkedin/callback',
+      scope: ['r_emailaddress', 'r_liteprofile'],
+    } as LinkedinStrategy.StrategyOption,
     (accessToken, refreshToken, profile, done) => {
       const provider = normalizeProvider(accessToken, refreshToken, profile);
 
@@ -48,11 +49,10 @@ passport.use(
   )
 );
 
-export const googleAuth = passport.authenticate('google', {
+export const linkedinAuth = passport.authenticate('linkedin', {
   session: false,
-  scope: ['email', 'profile'],
 });
 
-export const googleAuthCallback = passport.authenticate('google', {
+export const linkedinAuthCallback = passport.authenticate('linkedin', {
   session: false,
 });

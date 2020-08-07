@@ -116,10 +116,6 @@ describe('Meeting operations', () => {
         },
       },
     });
-
-    const meeting = await getManager().findOne(Meeting, { title });
-
-    expect(meeting).toBeDefined();
   });
 
   it('should delete a meeting', async () => {

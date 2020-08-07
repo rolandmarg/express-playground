@@ -4,7 +4,12 @@ import { meetingRepo, getManager, User, Meeting } from '../db';
 export const resolvers: Resolvers = {
   Query: {
     async me(_parent, _args, context) {
-      return context.user;
+      const user = await getManager().findOne(User, {
+        where: { email: context.auth.email },
+        relations: ['providers'],
+      });
+
+      return user;
     },
     async user(_parent, args) {
       const user = await getManager().findOne(User, args.id);
