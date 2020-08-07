@@ -54,6 +54,10 @@ describe('User operations', () => {
 
     await getManager().save(user);
 
+    const createdUser = await getManager().findOne(User);
+
+    expect(user.id).toBe(createdUser?.id);
+
     const res = await query({
       query: queries.user,
       variables: { id: user.id },

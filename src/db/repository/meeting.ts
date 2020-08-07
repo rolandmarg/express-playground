@@ -1,22 +1,39 @@
 import { getConnection } from 'typeorm';
 import { Meeting } from '../entity/Meeting';
+import { isIsoDate } from '../../utils';
 
 const query = () => getConnection().createQueryBuilder(Meeting, 'meeting');
 
-const isCursor = (str: string) => {
-  return Buffer.from(str, 'base64').toString('base64') === str;
+export const isCursor = (str: string) => {
+  const decoded = Buffer.from(str, 'base64').toString('binary');
+
+  const [id, startsAt] = decoded.split(' ');
+
+  if (isNaN(+id)) {
+    return false;
+  }
+
+  if (!isIsoDate(startsAt)) {
+    return false;
+  }
+
+  return true;
 };
 
-const encodeCursor = (meeting: Meeting) => {
+interface encodeCursorOptions {
+  id: number;
+  startsAt: Date;
+}
+export const encodeCursor = ({ id, startsAt }: encodeCursorOptions) => {
   const cursor = Buffer.from(
-    `${meeting.id} ${meeting.startsAt}`,
+    `${id} ${startsAt.toISOString()}`,
     'binary'
   ).toString('base64');
 
   return cursor;
 };
 
-const decodeCursor = (cursor: string) => {
+export const decodeCursor = (cursor: string) => {
   const decoded = Buffer.from(cursor, 'base64').toString('binary');
 
   const [id, startsAt] = decoded.split(' ');
@@ -42,7 +59,9 @@ export const getPaginated = async (options: getPaginatedOptions) => {
       .where('meeting.startsAt > :startsAt', { startsAt })
       .andWhere('meeting.id > :id', { id });
   } else if (after) {
-    qb = qb.where('meeting.startsAt > :after', { after });
+    qb = qb.where('meeting.startsAt > :after', {
+      after: new Date(after).toISOString(),
+    });
   }
 
   const nodesPromise = qb
@@ -50,11 +69,11 @@ export const getPaginated = async (options: getPaginatedOptions) => {
     .addOrderBy('meeting.id')
     .take(first)
     .getMany();
-  const firstMPromise = await query()
+  const firstMPromise = query()
     .orderBy('meeting.startsAt')
     .addOrderBy('meeting.id')
     .getOne();
-  const lastMPromise = await query()
+  const lastMPromise = query()
     .orderBy('meeting.startsAt', 'DESC')
     .addOrderBy('meeting.id', 'DESC')
     .getOne();
