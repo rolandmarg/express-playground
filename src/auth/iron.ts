@@ -1,7 +1,7 @@
 import ms from 'ms';
 import Iron from '@hapi/iron';
 import env from '../env';
-import { AppError, Unauthorized } from '../utils';
+import { AppError, Unauthorized } from '../utils/errors';
 
 export interface Token {
   payload: any;

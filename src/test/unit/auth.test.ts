@@ -1,6 +1,6 @@
 import ms from 'ms';
 import Iron from '@hapi/iron';
-import { seal, unseal } from '../../auth';
+import { seal, unseal } from '../../auth/iron';
 import env from '../../env';
 import { sleep } from '../../utils';
 

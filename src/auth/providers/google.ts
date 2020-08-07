@@ -1,7 +1,7 @@
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth';
-import { Provider } from '../db';
-import env from '../env';
+import { Provider } from '../../db';
+import env from '../../env';
 
 const normalizeProvider = (
   accessToken: string,

@@ -1,6 +1,6 @@
+import { getManager } from 'typeorm';
 import { User } from '../entity/User';
 import { Provider } from '../entity/Provider';
-import { getManager } from 'typeorm';
 
 export const upsertByProvider = async (provider: Provider) => {
   let user = await getManager().findOne(User, {
@@ -29,8 +29,8 @@ export const upsertByProvider = async (provider: Provider) => {
 
   await getManager().transaction(async (transactionalManager) => {
     await Promise.all([
-      transactionalManager.save(provider),
       transactionalManager.save(user),
+      transactionalManager.save(provider),
     ]);
   });
 

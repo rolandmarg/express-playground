@@ -2,7 +2,6 @@ import ms from 'ms';
 import supertest from 'supertest';
 import app from '../../app';
 import { connect, close, User, Provider, getManager } from '../../db';
-import { googleAuth, googleAuthCallback } from '../../auth/google';
 import env from '../../env';
 import { sleep } from '../../utils';
 
@@ -10,19 +9,31 @@ const testUser = {
   id: 1,
   email: 'test@gmail.com',
 };
+const testProvider = new Provider();
 
-jest.mock('../../auth/google', () => ({
+testProvider.provider = 'test';
+testProvider.providerId = '123';
+testProvider.email = testUser.email;
+testProvider.accessToken = 'testAccess';
+
+jest.mock('../../auth/providers/google', () => ({
   googleAuth: jest.fn((_req, _res, next) => {
     next();
   }),
   googleAuthCallback: jest.fn((req, _res, next) => {
-    const testProvider = new Provider();
-    testProvider.provider = 'test';
-    testProvider.providerId = '123';
-    testProvider.email = testUser.email;
-    testProvider.accessToken = 'testAccess';
-
     req.user = testProvider;
+
+    next();
+  }),
+}));
+
+jest.mock('../../auth/providers/linkedin', () => ({
+  linkedinAuth: jest.fn((_req, _res, next) => {
+    next();
+  }),
+  linkedinAuthCallback: jest.fn((req, _res, next) => {
+    req.user = testProvider;
+
     next();
   }),
 }));
@@ -60,17 +71,18 @@ describe('Auth API', () => {
     expect(res.status).toBe(401);
   });
 
-  it('/auth/google should invoke googleAuth middleware', async () => {
-    await req.get('/auth/google');
-
-    expect(googleAuth).toHaveBeenCalled();
-  });
-
-  it('/auth/google/callback should set cookie and redirect', async () => {
+  it('/auth/google/callback should set auth cookie and redirect', async () => {
     const res = await req.get('/auth/google/callback');
 
     expect(res.status).toBe(302);
-    expect(googleAuthCallback).toHaveBeenCalled();
+    expect(res.header['set-cookie'][0]).toContain('sid');
+    expect(res.header['set-cookie'][0]).toContain('HttpOnly');
+  });
+
+  it('/auth/linkedin/callback should set auth cookie and redirect', async () => {
+    const res = await req.get('/auth/linkedin/callback');
+
+    expect(res.status).toBe(302);
     expect(res.header['set-cookie'][0]).toContain('sid');
     expect(res.header['set-cookie'][0]).toContain('HttpOnly');
   });

@@ -1,7 +1,7 @@
 import passport from 'passport';
 import LinkedinStrategy from 'passport-linkedin-oauth2';
-import { Provider } from '../db';
-import env from '../env';
+import { Provider } from '../../db';
+import env from '../../env';
 
 const normalizeProvider = (
   accessToken: string,

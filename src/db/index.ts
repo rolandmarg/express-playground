@@ -12,6 +12,7 @@ export * as userRepo from './repository/user';
 export { User, Meeting, Provider };
 
 let connection: Connection;
+
 export const connect = async () => {
   connection = await createConnection({
     type: 'postgres',

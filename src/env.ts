@@ -1,4 +1,4 @@
-import { AppError } from './utils';
+import { AppError } from './utils/errors';
 
 const env = {
   NODE_ENV: process.env.NODE_ENV as

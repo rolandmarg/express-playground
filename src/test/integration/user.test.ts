@@ -69,6 +69,6 @@ describe('User operations', () => {
       },
     });
 
-    expect(res.data?.user.id).toBe(user.id);
+    expect(+res.data?.user.id).toBe(user.id);
   });
 });

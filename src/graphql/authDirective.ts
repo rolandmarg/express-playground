@@ -6,10 +6,9 @@ import {
   GraphQLObjectType,
   GraphQLField,
 } from 'graphql';
-
 import { SchemaDirectiveVisitor } from 'apollo-server-express';
 import { IContext } from './apollo';
-import { authRequest } from '../auth';
+import { authRequest } from '../auth/session';
 
 export class AuthDirective extends SchemaDirectiveVisitor {
   public static getDirectiveDeclaration(

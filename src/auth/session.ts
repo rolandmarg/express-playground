@@ -3,12 +3,8 @@ import { Request, RequestHandler } from 'express';
 import env from '../env';
 import { Unauthorized } from '../utils';
 
-import { seal, unseal } from './helpers';
+import { seal, unseal } from './iron';
 import { userRepo, Provider } from '../db';
-
-export * from './helpers';
-export * from './google';
-export * from './linkedin';
 
 export const authRequest = async (req: Request) => {
   const cookieToken = req.cookies['sid'];
@@ -35,6 +31,10 @@ export const authMiddleware: RequestHandler = async (req, _res, next) => {
   req.user = payload;
 
   next();
+};
+
+export const sendSessionInfo: RequestHandler = (req, res) => {
+  res.send(req.user);
 };
 
 export const createSession: RequestHandler = async (req, res) => {
