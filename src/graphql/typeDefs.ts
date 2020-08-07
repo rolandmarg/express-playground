@@ -67,8 +67,7 @@ export const typeDefs = gql`
     users: [User!]!
     me: User @auth
     """
-    after parameter maybe opaque cursor passed from server, or date
-    to be used in 'where meeting.startsAt > date'
+    'after: String' parameter may be date or opaque cursor passed from server
     """
     meetings(first: Int!, after: String): MeetingsConnection!
     meeting(id: ID!): Meeting

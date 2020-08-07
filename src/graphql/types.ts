@@ -86,10 +86,7 @@ export type Query = {
   user?: Maybe<User>;
   users: Array<User>;
   me?: Maybe<User>;
-  /**
-   * after parameter maybe opaque cursor passed from server, or date
-   * to be used in 'where meeting.startsAt > date'
-   */
+  /** 'after: String' parameter may be date or opaque cursor passed from server */
   meetings: MeetingsConnection;
   meeting?: Maybe<Meeting>;
 };
