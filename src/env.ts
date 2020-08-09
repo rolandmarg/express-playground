@@ -7,7 +7,14 @@ const env = {
     | 'development'
     | undefined,
 
-  DB_URL: process.env.DB_URL as string,
+  APP_PORT: process.env.APP_PORT as string,
+  APP_HOST: process.env.APP_HOST as string,
+
+  DB_USER: process.env.DB_USER as string,
+  DB_PASSWORD: process.env.DB_PASSWORD as string,
+  DB_HOST: process.env.DB_HOST as string,
+  DB_PORT: process.env.DB_PORT as string,
+  DB_DATABASE: process.env.DB_DATABASE as string,
 
   TOKEN_SECRET: process.env.TOKEN_SECRET as string,
   TOKEN_MAX_AGE: process.env.TOKEN_MAX_AGE as string,

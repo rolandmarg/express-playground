@@ -39,7 +39,11 @@ jest.mock('../../auth/providers/linkedin', () => ({
 }));
 
 jest.mock('../../env', () => ({
-  DB_URL: 'postgresql://rem@localhost:5432/midnightest',
+  DB_HOST: 'localhost',
+  DB_PORT: 5432,
+  DB_PASSWORD: '12eoijwa2',
+  DB_USER: 'rem',
+  DB_DATABASE: 'midnightest',
   COOKIE_MAX_AGE: '1d',
   TOKEN_MAX_AGE: '100ms',
   TOKEN_SECRET: 'Password string too short (min 32 characters required)',

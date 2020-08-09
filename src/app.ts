@@ -1,3 +1,4 @@
+import { Server } from 'http';
 import express, { ErrorRequestHandler } from 'express';
 import passport from 'passport';
 import helmet from 'helmet';
@@ -7,6 +8,7 @@ import 'express-async-errors';
 import { apollo } from './graphql';
 import { routes } from './routes';
 import { AppError } from './utils';
+import env from './env';
 
 const app = express();
 
@@ -37,3 +39,15 @@ const dreamCatcher: ErrorRequestHandler = (err, _req, res, next) => {
 app.use(dreamCatcher);
 
 export default app;
+
+let server: Server;
+
+export const start = () => {
+  server = app.listen(+env.APP_PORT, env.APP_HOST);
+
+  return server;
+};
+
+export const stop = () => {
+  return server.close();
+};

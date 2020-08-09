@@ -3,7 +3,11 @@ import { connect, close, Meeting, getManager } from '../../db';
 import { apolloServer, queries, mutations } from '../../graphql';
 
 jest.mock('../../env', () => ({
-  DB_URL: 'postgresql://rem@localhost:5432/midnightest',
+  DB_HOST: 'localhost',
+  DB_PORT: 5432,
+  DB_PASSWORD: '12eoijwa2',
+  DB_USER: 'rem',
+  DB_DATABASE: 'midnightest',
 }));
 
 const { query, mutate } = createTestClient(apolloServer);

@@ -16,7 +16,11 @@ let connection: Connection;
 export const connect = async () => {
   connection = await createConnection({
     type: 'postgres',
-    url: env.DB_URL,
+    host: env.DB_HOST,
+    port: +env.DB_PORT,
+    username: env.DB_USER,
+    password: env.DB_PASSWORD,
+    database: env.DB_DATABASE,
     synchronize: env.NODE_ENV !== 'production',
     entities: [User, Meeting, Provider],
   });

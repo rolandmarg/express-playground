@@ -1,12 +1,12 @@
 import 'dotenv/config';
-import app from './app';
-import { connect } from './db';
+import * as app from './app';
+import * as db from './db';
 
 async function bootstrap() {
   try {
-    await connect();
+    await db.connect();
 
-    app.listen(3000);
+    app.start();
 
     console.info('server up and running');
   } catch (e) {
@@ -14,5 +14,22 @@ async function bootstrap() {
     process.exit(1);
   }
 }
+
+async function shutdown() {
+  try {
+    await db.close();
+
+    app.stop();
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+}
+
+process.on('SIGINT', shutdown);
+
+process.on('SIGTERM', shutdown);
+
+process.on('unhandledRejection', shutdown);
 
 bootstrap();
