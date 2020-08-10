@@ -5,10 +5,9 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import 'reflect-metadata';
 import 'express-async-errors';
-import { apollo } from './graphql';
+import { apollo } from './graphql/apollo';
 import { routes } from './routes';
-import { AppError } from './utils';
-import env from './env';
+import { AppError, APP_PORT, APP_HOST } from './utils';
 
 const app = express();
 
@@ -43,7 +42,7 @@ export default app;
 let server: Server;
 
 export const start = () => {
-  server = app.listen(+env.APP_PORT, env.APP_HOST);
+  server = app.listen(APP_PORT, APP_HOST);
 
   return server;
 };

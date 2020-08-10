@@ -1,8 +1,12 @@
-import { getManager, MoreThan, FindConditions } from 'typeorm';
+import { MoreThan, FindConditions, getRepository } from 'typeorm';
 import { Meeting } from '../entity/Meeting';
-import { isIsoDate } from '../../utils';
+import { isIsoDate } from '../utils';
 
-export const isCursor = (str: string) => {
+export function getMeetingRepo() {
+  return getRepository(Meeting);
+}
+
+export function isCursor(str: string) {
   const decoded = Buffer.from(str, 'base64').toString('binary');
 
   const [id, startsAt] = decoded.split(' ');
@@ -16,22 +20,18 @@ export const isCursor = (str: string) => {
   }
 
   return true;
-};
-
-interface encodeCursorOptions {
-  id: number;
-  startsAt: Date;
 }
-export const encodeCursor = ({ id, startsAt }: encodeCursorOptions) => {
+
+export function encodeCursor(opts: { id: number; startsAt: Date }) {
   const cursor = Buffer.from(
-    `${id} ${startsAt.toISOString()}`,
+    `${opts.id} ${opts.startsAt.toISOString()}`,
     'binary'
   ).toString('base64');
 
   return cursor;
-};
+}
 
-export const decodeCursor = (cursor: string) => {
+export function decodeCursor(cursor: string) {
   const decoded = Buffer.from(cursor, 'base64').toString('binary');
 
   const [id, startsAt] = decoded.split(' ');
@@ -39,15 +39,14 @@ export const decodeCursor = (cursor: string) => {
     id: +id,
     startsAt,
   };
-};
-
-interface getPaginatedOptions {
-  first: number;
-  after: string | null | undefined;
 }
 
-export const getPaginated = async (options: getPaginatedOptions) => {
-  const { first, after } = options;
+export async function getPaginated(opts: {
+  first: number;
+  after: string | null | undefined;
+}) {
+  const { first, after } = opts;
+  const meetingRepo = getMeetingRepo();
 
   const findOpts: FindConditions<Meeting> = {};
 
@@ -59,20 +58,20 @@ export const getPaginated = async (options: getPaginatedOptions) => {
     findOpts.startsAt = MoreThan(new Date(after).toISOString());
   }
 
-  const nodesPromise = getManager().find(Meeting, {
+  const nodesPromise = meetingRepo.find({
     where: {
       ...findOpts,
     },
     order: { startsAt: 'ASC', id: 'ASC' },
     take: first,
   });
-  const firstMPromise = getManager().findOne(Meeting, {
+  const firstMPromise = meetingRepo.findOne({
     order: {
       startsAt: 'ASC',
       id: 'ASC',
     },
   });
-  const lastMPromise = getManager().findOne(Meeting, {
+  const lastMPromise = meetingRepo.findOne({
     order: {
       startsAt: 'DESC',
       id: 'DESC',
@@ -89,8 +88,8 @@ export const getPaginated = async (options: getPaginatedOptions) => {
     return { node, cursor: encodeCursor(node) };
   });
 
-  const endCursor = lastM ? encodeCursor(lastM) : null;
-  const startCursor = firstM ? encodeCursor(firstM) : null;
+  const endCursor = lastM ? encodeCursor(lastM) : undefined;
+  const startCursor = firstM ? encodeCursor(firstM) : undefined;
 
   let hasPreviousPage = false;
   let hasNextPage = false;
@@ -113,4 +112,4 @@ export const getPaginated = async (options: getPaginatedOptions) => {
       hasPreviousPage,
     },
   };
-};
+}

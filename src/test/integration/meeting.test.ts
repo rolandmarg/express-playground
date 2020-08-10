@@ -1,14 +1,9 @@
 import { createTestClient } from 'apollo-server-testing';
-import { connect, close, Meeting, getManager } from '../../db';
-import { apolloServer, queries, mutations } from '../../graphql';
-
-jest.mock('../../env', () => ({
-  DB_HOST: 'localhost',
-  DB_PORT: 5432,
-  DB_PASSWORD: '12eoijwa2',
-  DB_USER: 'rem',
-  DB_DATABASE: 'midnightest',
-}));
+import { connect, close } from '../../db';
+import { apolloServer } from '../../graphql/apollo';
+import * as ops from '../../graphql/operations';
+import { getManager } from 'typeorm';
+import { Meeting } from '../../entity/Meeting';
 
 const { query, mutate } = createTestClient(apolloServer);
 
@@ -34,7 +29,7 @@ describe('Meeting operations', () => {
     await getManager().save(meeting);
 
     const res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: 1 },
     });
 
@@ -65,7 +60,7 @@ describe('Meeting operations', () => {
 
   it('should fetch empty list of meetings', async () => {
     const res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: 1 },
     });
 
@@ -81,7 +76,7 @@ describe('Meeting operations', () => {
     await getManager().save(meeting);
 
     const res = await query({
-      query: queries.meeting,
+      query: ops.meetingQuery,
       variables: { id: meeting.id },
     });
 
@@ -100,7 +95,7 @@ describe('Meeting operations', () => {
   it('should create a new meeting', async () => {
     const title = 'testMeeting';
     const res = await mutate({
-      mutation: mutations.createMeeting,
+      mutation: ops.createMeetingMutation,
       variables: {
         title,
         startsAt: new Date().toISOString(),
@@ -131,7 +126,7 @@ describe('Meeting operations', () => {
     await getManager().save(meeting);
 
     const res = await mutate({
-      mutation: mutations.deleteMeetings,
+      mutation: ops.deleteMeetingsMutation,
     });
 
     expect(res).toMatchSnapshot({
@@ -150,7 +145,7 @@ describe('Meeting operations', () => {
     const numOfMeetings = 1;
 
     const res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: numOfMeetings },
     });
 
@@ -173,7 +168,7 @@ describe('Meeting operations', () => {
     const numOfMeetings = 1;
 
     const res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: numOfMeetings },
     });
 
@@ -196,14 +191,14 @@ describe('Meeting operations', () => {
     const numOfMeetings = 1;
 
     let res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: numOfMeetings },
     });
 
     const { edgeCursor: cursor } = parseRes(res);
 
     res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: numOfMeetings, after: cursor },
     });
 
@@ -227,14 +222,14 @@ describe('Meeting operations', () => {
     const numOfMeetings = 1;
 
     let res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: numOfMeetings },
     });
 
     const { edgeCursor: cursor } = parseRes(res);
 
     res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: numOfMeetings, after: cursor },
     });
 
@@ -258,7 +253,7 @@ describe('Meeting operations', () => {
     const numOfMeetings = 2;
 
     const res = await query({
-      query: queries.meetings,
+      query: ops.meetingsQuery,
       variables: { first: numOfMeetings, after: '2020' },
     });
 

@@ -1,6 +1,8 @@
 import { promisify } from 'util';
 
 export * from './errors';
+export * from './iron';
+export * from './env';
 
 export const sleep = promisify(setTimeout);
 

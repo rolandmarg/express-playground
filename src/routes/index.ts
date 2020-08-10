@@ -7,7 +7,7 @@ import {
   authMiddleware,
   sendSessionInfo,
   logout,
-} from '../auth/session';
+} from '../auth/helpers';
 
 export const routes = () => {
   const router = Router();

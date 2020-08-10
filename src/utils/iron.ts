@@ -1,7 +1,6 @@
-import ms from 'ms';
 import Iron from '@hapi/iron';
-import env from '../env';
-import { AppError, Unauthorized } from '../utils/errors';
+import { AppError, Unauthorized } from './errors';
+import { TOKEN_SECRET, TOKEN_MAX_AGE_IN_MS } from './env';
 
 export interface Token {
   payload: any;
@@ -18,7 +17,7 @@ export async function seal(payload: any) {
   let sealedToken: string;
 
   try {
-    sealedToken = await Iron.seal(token, env.TOKEN_SECRET, Iron.defaults);
+    sealedToken = await Iron.seal(token, TOKEN_SECRET, Iron.defaults);
   } catch (e) {
     throw new Unauthorized();
   }
@@ -30,7 +29,7 @@ export async function unseal(sealedToken: string) {
   let token: Token;
 
   try {
-    token = await Iron.unseal(sealedToken, env.TOKEN_SECRET, Iron.defaults);
+    token = await Iron.unseal(sealedToken, TOKEN_SECRET, Iron.defaults);
   } catch (e) {
     throw new Unauthorized();
   }
@@ -39,7 +38,7 @@ export async function unseal(sealedToken: string) {
     throw new Unauthorized();
   }
 
-  const expiresAt = token.createdAt + ms(env.TOKEN_MAX_AGE);
+  const expiresAt = token.createdAt + TOKEN_MAX_AGE_IN_MS;
 
   if (Date.now() >= expiresAt) {
     throw new Unauthorized('Token expired');

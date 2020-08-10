@@ -1,14 +1,9 @@
 import { createTestClient } from 'apollo-server-testing';
-import { connect, close, User, getManager } from '../../db';
-import { apolloServer, queries } from '../../graphql';
-
-jest.mock('../../env', () => ({
-  DB_HOST: 'localhost',
-  DB_PORT: 5432,
-  DB_PASSWORD: '12eoijwa2',
-  DB_USER: 'rem',
-  DB_DATABASE: 'midnightest',
-}));
+import { connect, close } from '../../db';
+import { apolloServer } from '../../graphql/apollo';
+import * as ops from '../../graphql/operations';
+import { getManager } from 'typeorm';
+import { User } from '../../entity/User';
 
 const { query } = createTestClient(apolloServer);
 
@@ -31,7 +26,7 @@ describe('User operations', () => {
 
     await getManager().save(user);
 
-    const res = await query({ query: queries.users });
+    const res = await query({ query: ops.usersQuery });
 
     expect(res).toMatchSnapshot({
       data: {
@@ -47,7 +42,7 @@ describe('User operations', () => {
   });
 
   it('should fetch empty list of users', async () => {
-    const res = await query({ query: queries.users });
+    const res = await query({ query: ops.usersQuery });
 
     expect(res).toMatchSnapshot();
   });
@@ -59,7 +54,7 @@ describe('User operations', () => {
     await getManager().save(user);
 
     const res = await query({
-      query: queries.user,
+      query: ops.userQuery,
       variables: { id: user.id },
     });
 

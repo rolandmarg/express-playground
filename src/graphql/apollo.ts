@@ -4,24 +4,20 @@ import { typeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
 import { AuthDirective } from './authDirective';
 import { AppError } from '../utils';
+import { User } from '../entity/User';
 
-export interface IContext {
+export interface Context {
   req: Request;
   res: Response;
-  auth?: any;
+  currentUser?: User;
 }
 
 export const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
   schemaDirectives: { auth: AuthDirective },
-  context: ({ req, res }) => {
-    const ctx: IContext = {
-      req,
-      res,
-    };
-
-    return ctx;
+  context: ({ req, res }): Context => {
+    return { req, res };
   },
   formatError: (err) => {
     if (err.originalError instanceof AppError) {

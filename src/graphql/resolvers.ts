@@ -1,11 +1,14 @@
 import type { Resolvers } from './types';
-import { meetingRepo, getManager, User, Meeting } from '../db';
+import { getManager } from 'typeorm';
+import { User } from '../entity/User';
+import { Meeting } from '../entity/Meeting';
+import { getPaginated } from '../repository/meeting';
 
 export const resolvers: Resolvers = {
   Query: {
     async me(_parent, _args, context) {
       const user = await getManager().findOne(User, {
-        where: { email: context.auth.email },
+        where: { email: context.currentUser?.email },
         relations: ['providers'],
       });
 
@@ -27,9 +30,10 @@ export const resolvers: Resolvers = {
       return meeting;
     },
     async meetings(_parent, args) {
-      const meetingsConnection = await meetingRepo.getPaginated({
-        first: args.first,
-        after: args.after,
+      const { first, after } = args;
+      const meetingsConnection = await getPaginated({
+        first,
+        after,
       });
 
       return meetingsConnection;

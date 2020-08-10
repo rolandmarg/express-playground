@@ -7,8 +7,8 @@ import {
   GraphQLField,
 } from 'graphql';
 import { SchemaDirectiveVisitor } from 'apollo-server-express';
-import { IContext } from './apollo';
-import { authRequest } from '../auth/session';
+import { Context } from './apollo';
+import { authRequest } from '../auth/helpers';
 
 export class AuthDirective extends SchemaDirectiveVisitor {
   public static getDirectiveDeclaration(
@@ -26,7 +26,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
     });
   }
 
-  public visitObject(object: GraphQLObjectType<any, IContext>) {
+  public visitObject(object: GraphQLObjectType<any, Context>) {
     const fields = object.getFields();
 
     Object.keys(fields).forEach((fieldName) => {
@@ -34,21 +34,21 @@ export class AuthDirective extends SchemaDirectiveVisitor {
       const next = field.resolve || defaultFieldResolver;
 
       field.resolve = async function (result, args, context, info) {
-        const payload = await authRequest(context.req);
+        const user = await authRequest(context.req);
 
-        context.auth = payload;
+        context.currentUser = user;
 
         return next(result, args, context, info);
       };
     });
   }
 
-  public visitFieldDefinition(field: GraphQLField<any, IContext>) {
+  public visitFieldDefinition(field: GraphQLField<any, Context>) {
     const next = field.resolve || defaultFieldResolver;
     field.resolve = async function (result, args, context, info) {
-      const payload = await authRequest(context.req);
+      const user = await authRequest(context.req);
 
-      context.auth = payload;
+      context.currentUser = user;
 
       return next(result, args, context, info);
     };

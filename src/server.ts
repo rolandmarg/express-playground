@@ -6,7 +6,7 @@ async function bootstrap() {
   try {
     await db.connect();
 
-    app.start();
+    await app.start();
 
     console.info('server up and running');
   } catch (e) {

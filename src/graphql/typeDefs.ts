@@ -42,7 +42,7 @@ export const typeDefs = gql`
     cursor: String!
   }
 
-  type MeetingsConnection {
+  type MeetingConnection {
     edges: [MeetingEdge!]!
     pageInfo: PageInfo!
   }
@@ -69,7 +69,7 @@ export const typeDefs = gql`
     """
     'after: String' parameter may be date or opaque cursor passed from server
     """
-    meetings(first: Int!, after: String): MeetingsConnection!
+    meetings(first: Int!, after: String): MeetingConnection!
     meeting(id: ID!): Meeting
   }
 

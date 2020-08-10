@@ -1,28 +1,41 @@
-import ms from 'ms';
 import { Request, RequestHandler } from 'express';
-import env from '../env';
-import { Unauthorized } from '../utils';
-
-import { seal, unseal } from './iron';
-import { userRepo, Provider } from '../db';
+import {
+  Unauthorized,
+  seal,
+  unseal,
+  COOKIE_MAX_AGE_IN_MS,
+  NODE_ENV,
+} from '../utils';
+import { getManager } from 'typeorm';
+import { User } from '../entity/User';
+import { Provider } from '../entity/Provider';
+import { upsertByProvider } from '../repository/user';
 
 export const authRequest = async (req: Request) => {
   const cookieToken = req.cookies['sid'];
   const authBearerToken = req.get('Authorization')?.split(' ')[1];
 
   const token = cookieToken || authBearerToken;
-
   if (!token) {
     throw new Unauthorized('Token not found');
   }
 
   const payload = await unseal(token);
 
-  if (!payload) {
+  if (!payload || !payload.email) {
     throw new Unauthorized();
   }
 
-  return payload;
+  const user = await getManager().findOne(User, {
+    where: { email: payload.email },
+    relations: ['providers'],
+  });
+
+  if (!user) {
+    throw new Unauthorized();
+  }
+
+  return user;
 };
 
 export const authMiddleware: RequestHandler = async (req, _res, next) => {
@@ -44,14 +57,14 @@ export const createSession: RequestHandler = async (req, res) => {
     throw new Unauthorized('Email not provided');
   }
 
-  const user = await userRepo.upsertByProvider(provider);
+  const user = await upsertByProvider(provider);
 
   const token = await seal({ email: user.email });
 
   res.cookie('sid', token, {
     httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    maxAge: ms(env.COOKIE_MAX_AGE),
+    secure: NODE_ENV === 'production',
+    maxAge: COOKIE_MAX_AGE_IN_MS,
   });
 
   res.redirect('/secret');
@@ -60,7 +73,7 @@ export const createSession: RequestHandler = async (req, res) => {
 export const logout: RequestHandler = (_req, res) => {
   res.clearCookie('sid', {
     httpOnly: true,
-    secure: env.NODE_ENV === 'production',
+    secure: NODE_ENV === 'production',
   });
 
   res.redirect('/secret');

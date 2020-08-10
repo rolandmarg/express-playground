@@ -1,6 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { User as UserEntity, Meeting as MeetingEntity } from '../db';
-import { IContext } from '../graphql';
+import { User as UserEntity } from '../entity/User';
+import { Meeting as MeetingEntity } from '../entity/Meeting';
+import { Context } from '../graphql/apollo';
 export type Maybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
@@ -59,8 +60,8 @@ export type MeetingEdge = {
   cursor: Scalars['String'];
 };
 
-export type MeetingsConnection = {
-  __typename?: 'MeetingsConnection';
+export type MeetingConnection = {
+  __typename?: 'MeetingConnection';
   edges: Array<MeetingEdge>;
   pageInfo: PageInfo;
 };
@@ -87,7 +88,7 @@ export type Query = {
   users: Array<User>;
   me?: Maybe<User>;
   /** 'after: String' parameter may be date or opaque cursor passed from server */
-  meetings: MeetingsConnection;
+  meetings: MeetingConnection;
   meeting?: Maybe<Meeting>;
 };
 
@@ -205,7 +206,7 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<UserEntity>;
   Meeting: ResolverTypeWrapper<MeetingEntity>;
   MeetingEdge: ResolverTypeWrapper<Omit<MeetingEdge, 'node'> & { node: ResolversTypes['Meeting'] }>;
-  MeetingsConnection: ResolverTypeWrapper<Omit<MeetingsConnection, 'edges'> & { edges: Array<ResolversTypes['MeetingEdge']> }>;
+  MeetingConnection: ResolverTypeWrapper<Omit<MeetingConnection, 'edges'> & { edges: Array<ResolversTypes['MeetingEdge']> }>;
   CreateMeetingInput: CreateMeetingInput;
   SignInInput: SignInInput;
   CreateMeetingPayload: ResolverTypeWrapper<Omit<CreateMeetingPayload, 'meeting'> & { meeting: ResolversTypes['Meeting'] }>;
@@ -224,7 +225,7 @@ export type ResolversParentTypes = ResolversObject<{
   User: UserEntity;
   Meeting: MeetingEntity;
   MeetingEdge: Omit<MeetingEdge, 'node'> & { node: ResolversParentTypes['Meeting'] };
-  MeetingsConnection: Omit<MeetingsConnection, 'edges'> & { edges: Array<ResolversParentTypes['MeetingEdge']> };
+  MeetingConnection: Omit<MeetingConnection, 'edges'> & { edges: Array<ResolversParentTypes['MeetingEdge']> };
   CreateMeetingInput: CreateMeetingInput;
   SignInInput: SignInInput;
   CreateMeetingPayload: Omit<CreateMeetingPayload, 'meeting'> & { meeting: ResolversParentTypes['Meeting'] };
@@ -235,9 +236,9 @@ export type ResolversParentTypes = ResolversObject<{
 
 export type AuthDirectiveArgs = {  };
 
-export type AuthDirectiveResolver<Result, Parent, ContextType = IContext, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type AuthDirectiveResolver<Result, Parent, ContextType = Context, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type PageInfoResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
+export type PageInfoResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
   startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -245,7 +246,7 @@ export type PageInfoResolvers<ContextType = IContext, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type ProviderResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Provider'] = ResolversParentTypes['Provider']> = ResolversObject<{
+export type ProviderResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Provider'] = ResolversParentTypes['Provider']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   providerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   provider?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -259,7 +260,7 @@ export type ProviderResolvers<ContextType = IContext, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type UserResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
+export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -267,7 +268,7 @@ export type UserResolvers<ContextType = IContext, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type MeetingResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Meeting'] = ResolversParentTypes['Meeting']> = ResolversObject<{
+export type MeetingResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Meeting'] = ResolversParentTypes['Meeting']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   startsAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -275,43 +276,43 @@ export type MeetingResolvers<ContextType = IContext, ParentType extends Resolver
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type MeetingEdgeResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['MeetingEdge'] = ResolversParentTypes['MeetingEdge']> = ResolversObject<{
+export type MeetingEdgeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['MeetingEdge'] = ResolversParentTypes['MeetingEdge']> = ResolversObject<{
   node?: Resolver<ResolversTypes['Meeting'], ParentType, ContextType>;
   cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type MeetingsConnectionResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['MeetingsConnection'] = ResolversParentTypes['MeetingsConnection']> = ResolversObject<{
+export type MeetingConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['MeetingConnection'] = ResolversParentTypes['MeetingConnection']> = ResolversObject<{
   edges?: Resolver<Array<ResolversTypes['MeetingEdge']>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type CreateMeetingPayloadResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['CreateMeetingPayload'] = ResolversParentTypes['CreateMeetingPayload']> = ResolversObject<{
+export type CreateMeetingPayloadResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CreateMeetingPayload'] = ResolversParentTypes['CreateMeetingPayload']> = ResolversObject<{
   meeting?: Resolver<ResolversTypes['Meeting'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
-export type QueryResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  meetings?: Resolver<ResolversTypes['MeetingsConnection'], ParentType, ContextType, RequireFields<QueryMeetingsArgs, 'first'>>;
+  meetings?: Resolver<ResolversTypes['MeetingConnection'], ParentType, ContextType, RequireFields<QueryMeetingsArgs, 'first'>>;
   meeting?: Resolver<Maybe<ResolversTypes['Meeting']>, ParentType, ContextType, RequireFields<QueryMeetingArgs, 'id'>>;
 }>;
 
-export type MutationResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createMeeting?: Resolver<ResolversTypes['CreateMeetingPayload'], ParentType, ContextType, RequireFields<MutationCreateMeetingArgs, 'input'>>;
   deleteMeetings?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 }>;
 
-export type Resolvers<ContextType = IContext> = ResolversObject<{
+export type Resolvers<ContextType = Context> = ResolversObject<{
   PageInfo?: PageInfoResolvers<ContextType>;
   Provider?: ProviderResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   Meeting?: MeetingResolvers<ContextType>;
   MeetingEdge?: MeetingEdgeResolvers<ContextType>;
-  MeetingsConnection?: MeetingsConnectionResolvers<ContextType>;
+  MeetingConnection?: MeetingConnectionResolvers<ContextType>;
   CreateMeetingPayload?: CreateMeetingPayloadResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
@@ -322,8 +323,8 @@ export type Resolvers<ContextType = IContext> = ResolversObject<{
  * @deprecated
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
-export type IResolvers<ContextType = IContext> = Resolvers<ContextType>;
-export type DirectiveResolvers<ContextType = IContext> = ResolversObject<{
+export type IResolvers<ContextType = Context> = Resolvers<ContextType>;
+export type DirectiveResolvers<ContextType = Context> = ResolversObject<{
   auth?: AuthDirectiveResolver<any, any, ContextType>;
 }>;
 
@@ -332,4 +333,4 @@ export type DirectiveResolvers<ContextType = IContext> = ResolversObject<{
  * @deprecated
  * Use "DirectiveResolvers" root object instead. If you wish to get "IDirectiveResolvers", add "typesPrefix: I" to your config.
  */
-export type IDirectiveResolvers<ContextType = IContext> = DirectiveResolvers<ContextType>;
+export type IDirectiveResolvers<ContextType = Context> = DirectiveResolvers<ContextType>;

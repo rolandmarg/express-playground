@@ -1,7 +1,7 @@
 import passport from 'passport';
 import LinkedinStrategy from 'passport-linkedin-oauth2';
-import { Provider } from '../../db';
-import env from '../../env';
+import { Provider } from '../../entity/Provider';
+import { LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET } from '../../utils';
 
 const normalizeProvider = (
   accessToken: string,
@@ -36,8 +36,8 @@ const normalizeProvider = (
 passport.use(
   new LinkedinStrategy.Strategy(
     {
-      clientID: env.LINKEDIN_CLIENT_ID,
-      clientSecret: env.LINKEDIN_CLIENT_SECRET,
+      clientID: LINKEDIN_CLIENT_ID,
+      clientSecret: LINKEDIN_CLIENT_SECRET,
       callbackURL: 'http://localhost:3000/auth/linkedin/callback',
       scope: ['r_emailaddress', 'r_liteprofile'],
     } as LinkedinStrategy.StrategyOption,

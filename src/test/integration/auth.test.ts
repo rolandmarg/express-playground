@@ -1,9 +1,10 @@
-import ms from 'ms';
 import supertest from 'supertest';
 import app from '../../app';
-import { connect, close, User, Provider, getManager } from '../../db';
-import env from '../../env';
-import { sleep } from '../../utils';
+import { connect, close } from '../../db';
+import { sleep, TOKEN_MAX_AGE_IN_MS } from '../../utils';
+import { getManager } from 'typeorm';
+import { Provider } from '../../entity/Provider';
+import { User } from '../../entity/User';
 
 const testUser = {
   id: 1,
@@ -36,17 +37,6 @@ jest.mock('../../auth/providers/linkedin', () => ({
 
     next();
   }),
-}));
-
-jest.mock('../../env', () => ({
-  DB_HOST: 'localhost',
-  DB_PORT: 5432,
-  DB_PASSWORD: '12eoijwa2',
-  DB_USER: 'rem',
-  DB_DATABASE: 'midnightest',
-  COOKIE_MAX_AGE: '1d',
-  TOKEN_MAX_AGE: '100ms',
-  TOKEN_SECRET: 'Password string too short (min 32 characters required)',
 }));
 
 describe('Auth API', () => {
@@ -128,7 +118,7 @@ describe('Auth API', () => {
   it('/secret should return 401 after token expires', async () => {
     await agent.get('/auth/google/callback');
 
-    await sleep(ms(env.TOKEN_MAX_AGE));
+    await sleep(TOKEN_MAX_AGE_IN_MS);
 
     const res = await agent.get('/secret');
 

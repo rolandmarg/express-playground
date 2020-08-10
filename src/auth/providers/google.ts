@@ -1,7 +1,7 @@
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth';
-import { Provider } from '../../db';
-import env from '../../env';
+import { Provider } from '../../entity/Provider';
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '../../utils';
 
 const normalizeProvider = (
   accessToken: string,
@@ -36,8 +36,8 @@ const normalizeProvider = (
 passport.use(
   new GoogleStrategy.OAuth2Strategy(
     {
-      clientID: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL: 'http://localhost:3000/auth/google/callback',
     },
     (accessToken, refreshToken, profile, done) => {
