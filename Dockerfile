@@ -8,8 +8,6 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN echo "DB_HOST=db"> ./env
-
 RUN yarn build
 
 EXPOSE 3000

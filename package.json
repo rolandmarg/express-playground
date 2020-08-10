@@ -44,9 +44,7 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/src/utils/setupTests.ts"
-    ],
+    "globalSetup": "<rootDir>/src/utils/setupTests.ts",
     "testPathIgnorePatterns": [
       "<rootDir>/dist/",
       "<rootDir>/node_modules/"
