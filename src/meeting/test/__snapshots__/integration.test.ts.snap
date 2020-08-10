@@ -1,0 +1,286 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Meeting operations prev page should be true after fetching from specific date 1`] = `
+Object {
+  "data": Object {
+    "meetings": Object {
+      "edges": Array [
+        Object {
+          "cursor": Any<String>,
+          "node": Object {
+            "endsAt": Any<String>,
+            "id": Any<String>,
+            "startsAt": Any<String>,
+            "title": "testMeeting",
+          },
+        },
+        Object {
+          "cursor": Any<String>,
+          "node": Object {
+            "endsAt": Any<String>,
+            "id": Any<String>,
+            "startsAt": Any<String>,
+            "title": "testMeeting",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": Any<String>,
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": Any<String>,
+      },
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations prev page should be true when getting second meeting 1`] = `
+Object {
+  "data": Object {
+    "meetings": Object {
+      "edges": Array [
+        Object {
+          "cursor": Any<String>,
+          "node": Object {
+            "endsAt": Any<String>,
+            "id": Any<String>,
+            "startsAt": Any<String>,
+            "title": "testMeeting",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": Any<String>,
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": Any<String>,
+      },
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations prev/next pages should be true when getting second from many meetings 1`] = `
+Object {
+  "data": Object {
+    "meetings": Object {
+      "edges": Array [
+        Object {
+          "cursor": Any<String>,
+          "node": Object {
+            "endsAt": Any<String>,
+            "id": Any<String>,
+            "startsAt": Any<String>,
+            "title": "testMeeting",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": Any<String>,
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": Any<String>,
+      },
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations should create a new meeting 1`] = `
+Object {
+  "data": Object {
+    "createMeeting": Object {
+      "endsAt": Any<String>,
+      "id": Any<String>,
+      "startsAt": Any<String>,
+      "title": "testMeeting",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations should delete a meeting 1`] = `
+Object {
+  "data": Object {
+    "deleteMeetings": true,
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations should fetch empty list of meetings 1`] = `
+Object {
+  "data": Object {
+    "meetings": Object {
+      "edges": Array [],
+      "pageInfo": Object {
+        "endCursor": null,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": null,
+      },
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations should fetch freshly created meeting from database 1`] = `
+Object {
+  "data": Object {
+    "meetings": Object {
+      "edges": Array [
+        Object {
+          "cursor": Any<String>,
+          "node": Object {
+            "endsAt": Any<String>,
+            "id": Any<String>,
+            "startsAt": Any<String>,
+            "title": "testMeeting",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": Any<String>,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": Any<String>,
+      },
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations should fetch specific meeting 1`] = `
+Object {
+  "data": Object {
+    "meeting": Object {
+      "endsAt": Any<String>,
+      "id": Any<String>,
+      "startsAt": Any<String>,
+      "title": "testMeeting",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations should have different end/start cursors & next page true on two meetings 1`] = `
+Object {
+  "data": Object {
+    "meetings": Object {
+      "edges": Array [
+        Object {
+          "cursor": Any<String>,
+          "node": Object {
+            "endsAt": Any<String>,
+            "id": Any<String>,
+            "startsAt": Any<String>,
+            "title": "testMeeting",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": Any<String>,
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": Any<String>,
+      },
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Meeting operations should have same end/start cursors & next/previous pages false on one meeting 1`] = `
+Object {
+  "data": Object {
+    "meetings": Object {
+      "edges": Array [
+        Object {
+          "cursor": Any<String>,
+          "node": Object {
+            "endsAt": Any<String>,
+            "id": Any<String>,
+            "startsAt": Any<String>,
+            "title": "testMeeting",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": Any<String>,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": Any<String>,
+      },
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

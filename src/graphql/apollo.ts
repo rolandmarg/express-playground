@@ -1,37 +1,34 @@
-import { Request, Response } from 'express';
 import { ApolloServer } from 'apollo-server-express';
-import { typeDefs } from './typeDefs';
-import { resolvers } from './resolvers';
-import { AuthDirective } from './authDirective';
-import { AppError } from '../utils';
+import { createSchema } from './schema';
+import { context } from './context';
 
-export interface IContext {
-  req: Request;
-  res: Response;
-  auth?: any;
-}
+let server: ApolloServer;
 
-export const apolloServer = new ApolloServer({
-  typeDefs,
-  resolvers,
-  schemaDirectives: { auth: AuthDirective },
-  context: ({ req, res }) => {
-    const ctx: IContext = {
-      req,
-      res,
-    };
+const initApollo = async () => {
+  const schema = await createSchema();
 
-    return ctx;
-  },
-  formatError: (err) => {
-    if (err.originalError instanceof AppError) {
-      return err;
-    } else {
+  server = new ApolloServer({
+    schema,
+    context,
+    formatError: (err) => {
       console.error(err);
-      console.error(err.originalError);
-      return new AppError();
-    }
-  },
-});
+      return err;
+    },
+  });
+};
 
-export const apollo = () => apolloServer.getMiddleware();
+export const apollo = async () => {
+  if (!server) {
+    await initApollo();
+  }
+
+  return server;
+};
+
+export const apolloMiddleware = async () => {
+  if (!server) {
+    await initApollo();
+  }
+
+  return server.getMiddleware();
+};
