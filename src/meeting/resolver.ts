@@ -8,9 +8,12 @@ import {
   Mutation,
   ID,
 } from 'type-graphql';
-import { getRepository } from 'typeorm';
-import { Meeting, MeetingConnection } from './entity';
-import { getPaginated } from './repository';
+import {
+  getPaginated,
+  Meeting,
+  MeetingConnection,
+  getMeetingRepo,
+} from './repository';
 import { ConnectionArgs } from '../graphql/args';
 
 @ArgsType()
@@ -33,11 +36,9 @@ class CreateMeetingArgs {
 
 @Resolver()
 export class MeetingResolver {
-  constructor(private readonly meetingRepo = getRepository(Meeting)) {}
-
   @Query(() => Meeting, { nullable: true })
   async meeting(@Arg('id', () => ID) id: number) {
-    const meeting = await this.meetingRepo.findOne(id);
+    const meeting = await getMeetingRepo().findOne(id);
 
     return meeting;
   }
@@ -60,14 +61,14 @@ export class MeetingResolver {
     meeting.startsAt = new Date(startsAt);
     meeting.endsAt = new Date(endsAt);
 
-    await this.meetingRepo.save(meeting);
+    await getMeetingRepo().save(meeting);
 
     return meeting;
   }
 
   @Mutation(() => Boolean)
   async deleteMeetings() {
-    const result = await this.meetingRepo.delete({});
+    const result = await getMeetingRepo().delete({});
 
     return !!result.affected;
   }

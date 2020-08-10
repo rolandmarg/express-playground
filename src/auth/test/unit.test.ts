@@ -1,5 +1,11 @@
 import Iron from '@hapi/iron';
-import { seal, unseal, TOKEN_SECRET } from '../../utils';
+import {
+  seal,
+  unseal,
+  TOKEN_SECRET,
+  sleep,
+  TOKEN_MAX_AGE_IN_MS,
+} from '../../utils';
 
 const testUser = {
   id: 1,
@@ -23,6 +29,13 @@ describe('Auth unit tests', () => {
     const payload = await unseal(token);
 
     expect(payload).toEqual(testUser);
+  });
+  it('unseal should throw on expired token', async () => {
+    const token = await seal(testUser);
+
+    await sleep(TOKEN_MAX_AGE_IN_MS);
+
+    await expect(unseal(token)).rejects.toThrow('Token expired');
   });
 
   it('unseal should throw on malformed token', async () => {

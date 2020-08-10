@@ -1,4 +1,3 @@
-import { getRepository, Repository } from 'typeorm';
 import { connect, close } from '../../db';
 import { query, mutate } from '../../graphql/testClient';
 import {
@@ -7,14 +6,11 @@ import {
   createMeetingMutation,
   deleteMeetingsMutation,
 } from '../operation';
-import { Meeting } from '../entity';
+import { getMeetingRepo } from '../repository';
 
 describe('Meeting operations', () => {
-  let meetingRepo: Repository<Meeting>;
-
   beforeAll(async () => {
     await connect();
-    meetingRepo = getRepository(Meeting);
   });
 
   afterAll(async () => {
@@ -22,16 +18,16 @@ describe('Meeting operations', () => {
   });
 
   beforeEach(async () => {
-    await meetingRepo.clear();
+    await getMeetingRepo().clear();
   });
 
   it('should fetch freshly created meeting from database', async () => {
-    const meeting = meetingRepo.create();
+    const meeting = getMeetingRepo().create();
     meeting.title = 'testMeeting';
     meeting.startsAt = new Date();
     meeting.endsAt = new Date();
 
-    await meetingRepo.save(meeting);
+    await getMeetingRepo().save(meeting);
 
     const res = await query({
       query: meetingsQuery,
@@ -73,12 +69,12 @@ describe('Meeting operations', () => {
   });
 
   it('should fetch specific meeting', async () => {
-    const meeting = meetingRepo.create();
+    const meeting = getMeetingRepo().create();
     meeting.title = 'testMeeting';
     meeting.startsAt = new Date();
     meeting.endsAt = new Date();
 
-    await meetingRepo.save(meeting);
+    await getMeetingRepo().save(meeting);
 
     const res = await query({
       query: meetingQuery,
@@ -121,12 +117,12 @@ describe('Meeting operations', () => {
   });
 
   it('should delete a meeting', async () => {
-    const meeting = meetingRepo.create();
+    const meeting = getMeetingRepo().create();
     meeting.title = 'testMeeting';
     meeting.startsAt = new Date();
     meeting.endsAt = new Date();
 
-    await meetingRepo.save(meeting);
+    await getMeetingRepo().save(meeting);
 
     const res = await mutate({
       mutation: deleteMeetingsMutation,
@@ -138,7 +134,7 @@ describe('Meeting operations', () => {
       },
     });
 
-    const meetings = await meetingRepo.find();
+    const meetings = await getMeetingRepo().find();
     expect(meetings).toEqual([]);
   });
 
@@ -273,12 +269,12 @@ describe('Meeting operations', () => {
     expect(edgeLength).toBe(numOfMeetings);
   });
   const insertMeeting = async (startsAt?: Date) => {
-    const meeting = meetingRepo.create();
+    const meeting = getMeetingRepo().create();
     meeting.title = 'testMeeting';
     meeting.startsAt = startsAt || new Date();
     meeting.endsAt = new Date();
 
-    await meetingRepo.save(meeting);
+    await getMeetingRepo().save(meeting);
 
     return meeting;
   };

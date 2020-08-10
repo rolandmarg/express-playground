@@ -1,16 +1,11 @@
 import { connect, close } from '../../db';
 import { query } from '../../graphql/testClient';
 import { userQuery, usersQuery } from '../operation';
-import { getRepository, Repository } from 'typeorm';
-import { User } from '../entity';
+import { getUserRepo } from '../repository';
 
 describe('User operations', () => {
-  let userRepo: Repository<User>;
-
   beforeAll(async () => {
     await connect();
-
-    userRepo = getRepository(User);
   });
 
   afterAll(async () => {
@@ -18,14 +13,14 @@ describe('User operations', () => {
   });
 
   beforeEach(async () => {
-    await userRepo.delete({});
+    await getUserRepo().delete({});
   });
 
   it('should fetch all users', async () => {
-    const user = userRepo.create();
+    const user = getUserRepo().create();
     user.email = 'test@gmail.com';
 
-    await userRepo.save(user);
+    await getUserRepo().save(user);
 
     const res = await query({ query: usersQuery });
 
@@ -49,10 +44,10 @@ describe('User operations', () => {
   });
 
   it('should fetch specific user', async () => {
-    const user = userRepo.create();
+    const user = getUserRepo().create();
     user.email = 'test@gmail.com';
 
-    await userRepo.save(user);
+    await getUserRepo().save(user);
 
     const res = await query({
       query: userQuery,

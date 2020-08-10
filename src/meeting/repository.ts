@@ -2,6 +2,12 @@ import { MoreThan, FindConditions, getRepository } from 'typeorm';
 import { Meeting } from './entity';
 import { isIsoDate } from '../utils';
 
+export * from './entity';
+
+export function getMeetingRepo() {
+  return getRepository(Meeting);
+}
+
 export function isCursor(str: string) {
   const decoded = Buffer.from(str, 'base64').toString('binary');
 
@@ -39,7 +45,7 @@ export function decodeCursor(cursor: string) {
 
 export async function getPaginated(opts: { first: number; after?: string }) {
   const { first, after } = opts;
-  const meetingRepo = getRepository(Meeting);
+  const meetingRepo = getMeetingRepo();
 
   const findOpts: FindConditions<Meeting> = {};
 

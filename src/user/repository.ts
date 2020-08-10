@@ -2,8 +2,14 @@ import { getRepository } from 'typeorm';
 import { User } from './entity';
 import { Provider } from '../provider/entity';
 
+export * from './entity';
+
+export function getUserRepo() {
+  return getRepository(User);
+}
+
 export async function upsertByProvider(provider: Provider) {
-  const userRepo = getRepository(User);
+  const userRepo = getUserRepo();
 
   let user = await userRepo.findOne({
     where: { email: provider.email },

@@ -2,9 +2,9 @@ import { Express } from 'express';
 import supertest from 'supertest';
 import { init } from '../../app';
 import { connect, close } from '../../db';
-import { getRepository, Repository } from 'typeorm';
-import { Provider } from '../../provider/entity';
-import { User } from '../../user/entity';
+import { Provider, getProviderRepo } from '../../provider/repository';
+import { getUserRepo } from '../../user/repository';
+import { sleep, TOKEN_MAX_AGE_IN_MS } from '../../utils';
 
 const testUser = {
   id: 1,
@@ -43,13 +43,9 @@ describe('Auth API', () => {
   let app: Express;
   let req: ReturnType<typeof supertest>;
   let agent: ReturnType<typeof supertest.agent>;
-  let providerRepo: Repository<Provider>;
-  let userRepo: Repository<User>;
 
   beforeAll(async () => {
     await connect();
-    providerRepo = getRepository(Provider);
-    userRepo = getRepository(User);
     app = await init();
   });
 
@@ -61,8 +57,8 @@ describe('Auth API', () => {
     req = supertest(app);
     agent = supertest.agent(app);
 
-    await providerRepo.delete({});
-    await userRepo.delete({});
+    await getProviderRepo().delete({});
+    await getUserRepo().delete({});
   });
 
   it('/secret should return 401 without auth', async () => {
@@ -110,6 +106,18 @@ describe('Auth API', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ email: testUser.email });
+  });
+
+  it('/secret should return 401 after token expires', async () => {
+    await agent.get('/auth/google/callback');
+
+    await sleep(TOKEN_MAX_AGE_IN_MS);
+
+    const res = await agent.get('/secret');
+
+    expect(res.status).toBe(401);
+
+    expect(res.text).toBe('Token expired');
   });
 
   it('/logout should clear cookie', async () => {

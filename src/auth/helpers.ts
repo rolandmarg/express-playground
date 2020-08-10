@@ -1,5 +1,4 @@
 import { Request, RequestHandler } from 'express';
-import { upsertByProvider } from '../user/repository';
 import {
   Unauthorized,
   seal,
@@ -8,8 +7,7 @@ import {
   COOKIE_MAX_AGE_IN_MS,
 } from '../utils';
 import { Provider } from '../provider/entity';
-import { getRepository } from 'typeorm';
-import { User } from '../user/entity';
+import { getUserRepo, upsertByProvider } from '../user/repository';
 
 export const authRequest = async (req: Request) => {
   const cookieToken = req.cookies['sid'];
@@ -26,7 +24,7 @@ export const authRequest = async (req: Request) => {
     throw new Unauthorized();
   }
 
-  const user = await getRepository(User).findOne({
+  const user = await getUserRepo().findOne({
     where: { email: payload.email },
     relations: ['providers'],
   });
