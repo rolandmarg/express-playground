@@ -1,60 +1,31 @@
 import type { Resolvers } from './types';
-import { getManager } from 'typeorm';
-import { User } from '../entity/User';
-import { Meeting } from '../entity/Meeting';
-import { getPaginated } from '../repository/meeting';
+import { db } from '../db';
 
 export const resolvers: Resolvers = {
   Query: {
     async me(_parent, _args, context) {
-      const user = await getManager().findOne(User, {
-        where: { email: context.currentUser?.email },
-        relations: ['providers'],
-      });
-
-      return user;
+      return context.currentUser;
     },
-    async user(_parent, args) {
-      const user = await getManager().findOne(User, args.id);
-
-      return user;
-    },
-    async users() {
-      const users = await getManager().find(User);
-
-      return users;
-    },
-    async meeting(_parent, args) {
-      const meeting = await getManager().findOne(Meeting, args.id);
-
-      return meeting;
-    },
-    async meetings(_parent, args) {
-      const { first, after } = args;
-      const meetingsConnection = await getPaginated({
-        first,
-        after,
-      });
-
-      return meetingsConnection;
+    async meetings(_parent, { first, after }) {
+      if (after) {
+        return db.meetings.getPaginated({ first, after });
+      } else {
+        return db.meetings.getPaginated({ first });
+      }
     },
   },
   Mutation: {
-    async createMeeting(_parent, args) {
-      const meeting = new Meeting();
-
-      meeting.title = args.input.title;
-      meeting.startsAt = new Date(args.input.startsAt);
-      meeting.endsAt = new Date(args.input.endsAt);
-
-      await getManager().save(meeting);
-
-      return { meeting };
+    async createMeeting(_parent, { input }) {
+      return db.meetings.insert({
+        title: input.title,
+        endsAt: new Date(input.endsAt),
+        startsAt: new Date(input.startsAt),
+      });
     },
     async deleteMeetings() {
-      const result = await getManager().delete(Meeting, {});
+      await db.meetings.truncate();
 
-      return !!result.affected;
+      return true;
     },
   },
 };

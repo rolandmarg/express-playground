@@ -1,4 +1,5 @@
 **/graphql/types.ts
+sql/*
 
 #prettier does not respect .gitignore after .prettierignore is introduced
 

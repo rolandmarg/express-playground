@@ -1,12 +1,12 @@
 import 'dotenv/config';
-import * as app from './app';
-import * as db from './db';
+import { start, stop } from './app';
+import { db } from './db';
 
 async function bootstrap() {
   try {
-    await db.connect();
+    await db.createTables();
 
-    await app.start();
+    start();
 
     console.info('server up and running');
   } catch (e) {
@@ -17,9 +17,9 @@ async function bootstrap() {
 
 async function shutdown() {
   try {
-    await db.close();
+    db.close();
 
-    app.stop();
+    stop();
   } catch (e) {
     console.error(e);
     process.exit(1);

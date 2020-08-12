@@ -11,5 +11,5 @@ generates:
       maybeValue: T | null | undefined
       mapperTypeSuffix: Entity
       mappers:
-        User: ../entity/User#User
-        Meeting: ../entity/Meeting#Meeting
+        User: ../db#User
+        Meeting: ../db#Meeting

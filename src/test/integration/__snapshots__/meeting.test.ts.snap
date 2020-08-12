@@ -112,12 +112,10 @@ exports[`Meeting operations should create a new meeting 1`] = `
 Object {
   "data": Object {
     "createMeeting": Object {
-      "meeting": Object {
-        "endsAt": Any<String>,
-        "id": Any<String>,
-        "startsAt": Any<String>,
-        "title": "testMeeting",
-      },
+      "endsAt": Any<String>,
+      "id": Any<String>,
+      "startsAt": Any<String>,
+      "title": "testMeeting",
     },
   },
   "errors": undefined,
@@ -189,26 +187,6 @@ Object {
         "hasPreviousPage": false,
         "startCursor": Any<String>,
       },
-    },
-  },
-  "errors": undefined,
-  "extensions": undefined,
-  "http": Object {
-    "headers": Headers {
-      Symbol(map): Object {},
-    },
-  },
-}
-`;
-
-exports[`Meeting operations should fetch specific meeting 1`] = `
-Object {
-  "data": Object {
-    "meeting": Object {
-      "endsAt": Any<String>,
-      "id": Any<String>,
-      "startsAt": Any<String>,
-      "title": "testMeeting",
     },
   },
   "errors": undefined,

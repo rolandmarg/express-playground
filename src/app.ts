@@ -3,7 +3,6 @@ import express, { ErrorRequestHandler } from 'express';
 import passport from 'passport';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import 'reflect-metadata';
 import 'express-async-errors';
 import { apollo } from './graphql/apollo';
 import { routes } from './routes';

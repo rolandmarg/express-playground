@@ -1,4 +1,4 @@
-import { decodeCursor, encodeCursor, isCursor } from '../../repository/meeting';
+import { decodeCursor, encodeCursor, isCursor } from '../../db/repos/meeting';
 
 describe('Meeting unit tests', () => {
   it('encodeCursor should return string', () => {

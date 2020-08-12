@@ -1,24 +1,26 @@
 import passport from 'passport';
 import LinkedinStrategy from 'passport-linkedin-oauth2';
-import { Provider } from '../../entity/Provider';
-import { LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET } from '../../utils';
+import { ProviderIn } from '../../db';
+import {
+  LINKEDIN_CLIENT_ID,
+  LINKEDIN_CLIENT_SECRET,
+  Unauthorized,
+} from '../../utils';
 
 const normalizeProvider = (
   accessToken: string,
   refreshToken: string,
+  email: string,
   profile: LinkedinStrategy.Profile
 ) => {
-  const provider = new Provider();
-
-  provider.providerId = profile.id;
-  provider.provider = profile.provider;
-  provider.accessToken = accessToken;
-  provider.refreshToken = refreshToken;
-  provider.displayName = profile.displayName;
-
-  if (profile.emails && profile.emails.length) {
-    provider.email = profile.emails[0].value;
-  }
+  const provider: ProviderIn = {
+    email,
+    providerId: profile.id,
+    providerName: profile.provider,
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+    displayName: profile.displayName,
+  };
 
   if (profile.photos && profile.photos.length) {
     provider.photo = profile.photos[0].value;
@@ -42,7 +44,20 @@ passport.use(
       scope: ['r_emailaddress', 'r_liteprofile'],
     } as LinkedinStrategy.StrategyOption,
     (accessToken, refreshToken, profile, done) => {
-      const provider = normalizeProvider(accessToken, refreshToken, profile);
+      const emails = profile.emails;
+
+      if (!emails || !emails.length) {
+        return done(new Unauthorized('Email not provided'));
+      }
+
+      const email = emails[0].value;
+
+      const provider = normalizeProvider(
+        accessToken,
+        refreshToken,
+        email,
+        profile
+      );
 
       return done(null, provider);
     }

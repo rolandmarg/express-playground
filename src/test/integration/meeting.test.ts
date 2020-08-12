@@ -1,32 +1,25 @@
 import { createTestClient } from 'apollo-server-testing';
-import { connect, close } from '../../db';
+import { db, MeetingIn } from '../../db';
 import { apolloServer } from '../../graphql/apollo';
 import * as ops from '../../graphql/operations';
-import { getManager } from 'typeorm';
-import { Meeting } from '../../entity/Meeting';
 
 const { query, mutate } = createTestClient(apolloServer);
 
 describe('Meeting operations', () => {
   beforeAll(async () => {
-    await connect();
+    await db.meetings.create();
   });
 
   afterAll(async () => {
-    await close();
+    await db.close();
   });
 
   beforeEach(async () => {
-    await getManager().clear(Meeting);
+    await db.meetings.truncate();
   });
 
   it('should fetch freshly created meeting from database', async () => {
-    const meeting = new Meeting();
-    meeting.title = 'testMeeting';
-    meeting.startsAt = new Date();
-    meeting.endsAt = new Date();
-
-    await getManager().save(meeting);
+    const meeting = await insertTestMeeting();
 
     const res = await query({
       query: ops.meetingsQuery,
@@ -67,31 +60,6 @@ describe('Meeting operations', () => {
     expect(res).toMatchSnapshot();
   });
 
-  it('should fetch specific meeting', async () => {
-    const meeting = new Meeting();
-    meeting.title = 'testMeeting';
-    meeting.startsAt = new Date();
-    meeting.endsAt = new Date();
-
-    await getManager().save(meeting);
-
-    const res = await query({
-      query: ops.meetingQuery,
-      variables: { id: meeting.id },
-    });
-
-    expect(res).toMatchSnapshot({
-      data: {
-        meeting: {
-          id: expect.any(String),
-          endsAt: expect.any(String),
-          startsAt: expect.any(String),
-          title: meeting.title,
-        },
-      },
-    });
-  });
-
   it('should create a new meeting', async () => {
     const title = 'testMeeting';
     const res = await mutate({
@@ -106,41 +74,34 @@ describe('Meeting operations', () => {
     expect(res).toMatchSnapshot({
       data: {
         createMeeting: {
-          meeting: {
-            id: expect.any(String),
-            endsAt: expect.any(String),
-            startsAt: expect.any(String),
-            title,
-          },
+          id: expect.any(String),
+          endsAt: expect.any(String),
+          startsAt: expect.any(String),
+          title,
         },
       },
     });
   });
 
   it('should delete a meeting', async () => {
-    const meeting = new Meeting();
-    meeting.title = 'testMeeting';
-    meeting.startsAt = new Date();
-    meeting.endsAt = new Date();
+    await insertTestMeeting();
 
-    await getManager().save(meeting);
-
-    const res = await mutate({
+    await mutate({
       mutation: ops.deleteMeetingsMutation,
     });
 
-    expect(res).toMatchSnapshot({
-      data: {
-        deleteMeetings: true,
-      },
+    const res = await query({
+      query: ops.meetingsQuery,
+      variables: { first: 1 },
     });
 
-    const meetings = await getManager().find(Meeting);
-    expect(meetings).toEqual([]);
+    expect(res).toMatchSnapshot(
+      meetingSnapshot({ hasPreviousPage: false, hasNextPage: false })
+    );
   });
 
   it('should have same end/start cursors & next/previous pages false on one meeting', async () => {
-    await insertMeeting();
+    await insertTestMeeting();
 
     const numOfMeetings = 1;
 
@@ -162,8 +123,8 @@ describe('Meeting operations', () => {
   });
 
   it('should have different end/start cursors & next page true on two meetings', async () => {
-    await insertMeeting();
-    await insertMeeting();
+    await insertTestMeeting();
+    await insertTestMeeting();
 
     const numOfMeetings = 1;
 
@@ -185,8 +146,8 @@ describe('Meeting operations', () => {
   });
 
   it('prev page should be true when getting second meeting', async () => {
-    await insertMeeting();
-    await insertMeeting();
+    await insertTestMeeting();
+    await insertTestMeeting();
 
     const numOfMeetings = 1;
 
@@ -215,9 +176,9 @@ describe('Meeting operations', () => {
   });
 
   it('prev/next pages should be true when getting second from many meetings', async () => {
-    await insertMeeting();
-    await insertMeeting();
-    await insertMeeting();
+    await insertTestMeeting();
+    await insertTestMeeting();
+    await insertTestMeeting();
 
     const numOfMeetings = 1;
 
@@ -246,9 +207,9 @@ describe('Meeting operations', () => {
   });
 
   it('prev page should be true after fetching from specific date', async () => {
-    await insertMeeting(new Date('1980'));
-    await insertMeeting(new Date('2020-02-02'));
-    await insertMeeting(new Date('2020-02-02'));
+    await insertTestMeeting(new Date('1980'));
+    await insertTestMeeting(new Date('2020-02-02'));
+    await insertTestMeeting(new Date('2020-02-02'));
 
     const numOfMeetings = 2;
 
@@ -271,15 +232,14 @@ describe('Meeting operations', () => {
   });
 });
 
-const insertMeeting = async (startsAt?: Date) => {
-  const meeting = new Meeting();
-  meeting.title = 'testMeeting';
-  meeting.startsAt = startsAt || new Date();
-  meeting.endsAt = new Date();
+const insertTestMeeting = async (startsAt?: Date) => {
+  const meeting: MeetingIn = {
+    title: 'testMeeting',
+    startsAt: startsAt || new Date(),
+    endsAt: new Date(),
+  };
 
-  await getManager().save(meeting);
-
-  return meeting;
+  return db.meetings.insert(meeting);
 };
 
 const meetingSnapshot = (options: {

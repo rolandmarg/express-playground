@@ -35,9 +35,7 @@ export const createMeetingMutation = gql`
     createMeeting(
       input: { title: $title, startsAt: $startsAt, endsAt: $endsAt }
     ) {
-      meeting {
-        ...MeetingFields
-      }
+      ...MeetingFields
     }
   }
   ${meetingFragment}
@@ -56,33 +54,6 @@ export const meQuery = gql`
     }
   }
   ${userFragment}
-`;
-
-export const userQuery = gql`
-  query User($id: ID!) {
-    user(id: $id) {
-      ...UserFields
-    }
-  }
-  ${userFragment}
-`;
-
-export const usersQuery = gql`
-  query Users {
-    users {
-      ...UserFields
-    }
-  }
-  ${userFragment}
-`;
-
-export const meetingQuery = gql`
-  query Meeting($id: ID!) {
-    meeting(id: $id) {
-      ...MeetingFields
-    }
-  }
-  ${meetingFragment}
 `;
 
 export const meetingsQuery = gql`

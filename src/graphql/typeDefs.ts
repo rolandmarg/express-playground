@@ -13,11 +13,10 @@ export const typeDefs = gql`
   type Provider {
     id: ID!
     providerId: String!
-    provider: String!
+    providerName: String!
     email: String!
     accessToken: String!
     refreshToken: String
-    gender: String
     photo: String
     displayName: String
     fullName: String
@@ -58,23 +57,16 @@ export const typeDefs = gql`
     password: String!
   }
 
-  type CreateMeetingPayload {
-    meeting: Meeting!
-  }
-
   type Query {
-    user(id: ID!): User
-    users: [User!]!
     me: User @auth
     """
     'after: String' parameter may be date or opaque cursor passed from server
     """
     meetings(first: Int!, after: String): MeetingConnection!
-    meeting(id: ID!): Meeting
   }
 
   type Mutation {
-    createMeeting(input: CreateMeetingInput!): CreateMeetingPayload!
-    deleteMeetings: Boolean!
+    createMeeting(input: CreateMeetingInput!): Meeting!
+    deleteMeetings: Boolean
   }
 `;

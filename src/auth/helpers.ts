@@ -6,10 +6,7 @@ import {
   COOKIE_MAX_AGE_IN_MS,
   NODE_ENV,
 } from '../utils';
-import { getManager } from 'typeorm';
-import { User } from '../entity/User';
-import { Provider } from '../entity/Provider';
-import { upsertByProvider } from '../repository/user';
+import { db, ProviderIn } from '../db';
 
 export const authRequest = async (req: Request) => {
   const cookieToken = req.cookies['sid'];
@@ -26,10 +23,7 @@ export const authRequest = async (req: Request) => {
     throw new Unauthorized();
   }
 
-  const user = await getManager().findOne(User, {
-    where: { email: payload.email },
-    relations: ['providers'],
-  });
+  const user = await db.users.selectByEmail(payload.email);
 
   if (!user) {
     throw new Unauthorized();
@@ -39,9 +33,9 @@ export const authRequest = async (req: Request) => {
 };
 
 export const authMiddleware: RequestHandler = async (req, _res, next) => {
-  const payload = await authRequest(req);
+  const user = await authRequest(req);
 
-  req.user = payload;
+  req.user = user;
 
   next();
 };
@@ -51,13 +45,9 @@ export const sendSessionInfo: RequestHandler = (req, res) => {
 };
 
 export const createSession: RequestHandler = async (req, res) => {
-  const provider = req.user as Provider;
+  const provider = req.user as ProviderIn;
 
-  if (!provider.email) {
-    throw new Unauthorized('Email not provided');
-  }
-
-  const user = await upsertByProvider(provider);
+  const user = await db.users.upsertByProvider(provider);
 
   const token = await seal({ email: user.email });
 

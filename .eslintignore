@@ -6,3 +6,5 @@ coverage/*
 **/*.d.ts
 
 **/graphql/types.ts
+
+sql/*

@@ -64,8 +64,7 @@
     "passport": "^0.4.1",
     "passport-google-oauth": "^2.0.0",
     "passport-linkedin-oauth2": "^2.0.0",
-    "pg": "^8.3.0",
-    "typeorm": "^0.2.25"
+    "pg-promise": "^10.5.8"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "1.17.6",
@@ -94,7 +93,6 @@
     "jest": "^26.2.2",
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
-    "reflect-metadata": "^0.1.13",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.4",
     "ts-node-dev": "^1.0.0-pre.56",

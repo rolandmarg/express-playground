@@ -1,21 +1,18 @@
 import supertest from 'supertest';
 import app from '../../app';
-import { connect, close } from '../../db';
+import { db, ProviderIn } from '../../db';
 import { sleep, TOKEN_MAX_AGE_IN_MS } from '../../utils';
-import { getManager } from 'typeorm';
-import { Provider } from '../../entity/Provider';
-import { User } from '../../entity/User';
 
 const testUser = {
   id: 1,
   email: 'test@gmail.com',
 };
-const testProvider = new Provider();
-
-testProvider.provider = 'test';
-testProvider.providerId = '123';
-testProvider.email = testUser.email;
-testProvider.accessToken = 'testAccess';
+const testProvider: ProviderIn = {
+  providerName: 'test',
+  providerId: '123',
+  email: testUser.email,
+  accessToken: 'token',
+};
 
 jest.mock('../../auth/providers/google', () => ({
   googleAuth: jest.fn((_req, _res, next) => {
@@ -40,23 +37,23 @@ jest.mock('../../auth/providers/linkedin', () => ({
 }));
 
 describe('Auth API', () => {
-  let req: ReturnType<typeof supertest>;
-  let agent: ReturnType<typeof supertest.agent>;
+  const req = supertest(app);
+  let agent: supertest.SuperAgentTest;
 
   beforeAll(async () => {
-    await connect();
+    await db.users.create();
+    await db.providers.create();
   });
 
   afterAll(async () => {
-    await close();
+    await db.close();
   });
 
   beforeEach(async () => {
-    req = supertest(app);
     agent = supertest.agent(app);
 
-    await getManager().delete(Provider, {});
-    await getManager().delete(User, {});
+    await db.providers.delete();
+    await db.users.delete();
   });
 
   it('/secret should return 401 without auth', async () => {

@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS meetings (
+  id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  title VARCHAR(255) NOT NULL,
+  starts_at TIMESTAMPTZ NOT NULL,
+  ends_at TIMESTAMPTZ NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_meeting_starts_at ON meetings(starts_at, id);
