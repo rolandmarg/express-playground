@@ -131,7 +131,15 @@ Object {
 exports[`Meeting operations should delete a meeting 1`] = `
 Object {
   "data": Object {
-    "deleteMeetings": true,
+    "meetings": Object {
+      "edges": Array [],
+      "pageInfo": Object {
+        "endCursor": null,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": null,
+      },
+    },
   },
   "errors": undefined,
   "extensions": undefined,

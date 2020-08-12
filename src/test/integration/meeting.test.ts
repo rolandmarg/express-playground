@@ -95,9 +95,7 @@ describe('Meeting operations', () => {
       variables: { first: 1 },
     });
 
-    expect(res).toMatchSnapshot(
-      meetingSnapshot({ hasPreviousPage: false, hasNextPage: false })
-    );
+    expect(res).toMatchSnapshot();
   });
 
   it('should have same end/start cursors & next/previous pages false on one meeting', async () => {
