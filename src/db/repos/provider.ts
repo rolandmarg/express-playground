@@ -55,12 +55,11 @@ export class ProviderRepository {
     const { email, providerName, ...updateData } = insertData;
 
     const insertQuery = this.pgp.helpers.insert(insertData, cs);
-    const setQuery = this.pgp.helpers.sets(updateData, cs);
 
     const query =
       insertQuery +
       ' ON CONFLICT(email, provider_name) DO UPDATE SET ' +
-      setQuery;
+      cs.assignColumns({from: 'excluded', skip: ['email, provider_name']});
     return query;
   }
 }
