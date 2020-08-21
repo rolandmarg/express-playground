@@ -59,7 +59,7 @@ export class ProviderRepository {
     const query =
       insertQuery +
       ' ON CONFLICT(email, provider_name) DO UPDATE SET ' +
-      cs.assignColumns({from: 'excluded', skip: ['email, provider_name']});
+      cs.assignColumns({from: 'excluded', skip: ['email', 'provider_name']});
     return query;
   }
 }
