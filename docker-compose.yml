@@ -11,6 +11,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
   app:
     build: .
+    restart: unless-stopped
     environment:
       CONNECTION_STRING: 'postgresql://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_DATABASE}'
     depends_on:

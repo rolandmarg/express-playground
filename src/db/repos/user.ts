@@ -6,7 +6,7 @@ import { ProviderRepository } from './provider';
 
 export class UserRepository {
   constructor(
-    private readonly db: IDatabase<unknown, IClient>
+    private readonly db: IDatabase<{ providers: ProviderRepository }, IClient>
   ) {}
 
   async create() {

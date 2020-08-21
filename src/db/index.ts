@@ -18,7 +18,7 @@ const initOptions: IInitOptions<IExtensions> = {
   extend(obj: ExtendedProtocol) {
     obj.meetings = new MeetingRepository(obj);
     obj.providers = new ProviderRepository(obj, pgp);
-    obj.users = new UserRepository(obj, obj.providers);
+    obj.users = new UserRepository(obj);
 
     obj.createTables = async () => {
       await obj.meetings.create();
