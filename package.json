@@ -11,7 +11,7 @@
     "express",
     "typescript",
     "graphql",
-    "typeorm"
+    "pg-promise"
   ],
   "author": "@romMidnight",
   "license": "MIT",
