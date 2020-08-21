@@ -6,8 +6,7 @@ import { ProviderRepository } from './provider';
 
 export class UserRepository {
   constructor(
-    private readonly db: IDatabase<unknown, IClient>,
-    private readonly providerRepo: ProviderRepository
+    private readonly db: IDatabase<unknown, IClient>
   ) {}
 
   async create() {
@@ -27,7 +26,7 @@ export class UserRepository {
       const user = await t.oneOrNone<User>(sql.selectByEmail, { email });
 
       if (user) {
-        const query = this.providerRepo.selectQuery(email);
+        const query = t.providers.selectQuery(email);
 
         user.providers = await t.many(query);
       }
@@ -52,7 +51,7 @@ export class UserRepository {
         email: provider.email,
       });
 
-      const query = this.providerRepo.upsertQuery(provider, user);
+      const query = t.providers.upsertQuery(provider, user);
 
       await t.none(query);
 
